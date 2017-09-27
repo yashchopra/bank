@@ -1,0 +1,5 @@
+<%= user.email %>
+<%= form_for(user) do |f| %>
+	<%= f.select(:role, User.roles.keys.map {|role| [role.titleize, role]})%>
+	<button> <%= f.submit 'Update info'%> </button>
+<% end %>

@@ -1,0 +1,13 @@
+# Read about fixtures at http://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  acctype: MyString
+  accnumber: MyString
+  accrouting: MyString
+  user_id: 1
+
+two:
+  acctype: MyString
+  accnumber: MyString
+  accrouting: MyString
+  user_id: 1

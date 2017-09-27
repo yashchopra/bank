@@ -1,0 +1,11 @@
+<h1>I am User index page</h1>
+
+<% @users.each do |user| %>
+	<table>
+	<tbody>
+	<tr>
+        <td><%= render user %></td>
+     </tr>
+     </tbody>
+     </table>
+<% end %>
