@@ -1,29 +1,20 @@
 <p id="notice"><%= notice %></p>
 
-<p>
-  <strong>Acctype:</strong>
-  <%= @account.acctype %>
-</p>
+<h1>Trans</h1>
 
-<p>
-  <strong>Accnumber:</strong>
-  <%= @account.accnumber %>
-</p>
+<table>
+  <thead>
+    <tr>
+      <th>Amount</th>
+      <th>Credit</th>
+      <th>Balance</th>
+      <th>User</th>
+      <th>Account</th>
+      <th colspan="3"></th>
+    </tr>
+  </thead>
 
-<p>
-  <strong>Accrouting:</strong>
-  <%= @account.accrouting %>
-</p>
-
-<p>
-  <strong>User:</strong>
-  <%= @account.user_id %>
-</p>
-
-<%= link_to 'Edit', edit_user_account_path(@user, @account) %> |
-<%= link_to 'Back', user_accounts_path %>
-<%= link_to 'New Transaction', new_account_tran_path(@account) %>
-
+  <tbody>
     <% @trans.each do |tran| %>
       <tr>
         <td><%= tran.amount %></td>
@@ -36,3 +27,10 @@
         <td><%= link_to 'Destroy', tran, method: :delete, data: { confirm: 'Are you sure?' } %></td>
       </tr>
     <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New Tran', new_account_tran_path(@account) %>
+

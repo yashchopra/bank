@@ -13,6 +13,7 @@ class AccountsController < ApplicationController
   # GET /accounts/1
   # GET /accounts/1.json
   def show
+    @trans = @account.trans.all
   end
 
   # GET /accounts/new

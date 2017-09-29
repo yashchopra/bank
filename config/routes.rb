@@ -1,10 +1,15 @@
 Rails.application.routes.draw do
+  # resources :trans
   # resources :accounts
   devise_for :users
   
   
   resources :users do
-  	resources :accounts
+  	resources :accounts 
+  end
+
+  resources :accounts do
+      resources :trans
   end
 
   root to: "users#home"
