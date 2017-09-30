@@ -18,22 +18,17 @@
 
   <div class="field">
     <%= form.label :credit %>
-    <%= form.text_field :credit, id: :tran_credit %>
+    <%= form.select(:credit, Tran.credits.keys.map {|credit| [credit.titleize, credit]}) %>
+  </div>
+
+  <div class="field">
+    <%= form.label :transfer_account %>
+    <%= form.text_field :transfer_account, id: :tran_transfer_account %>
   </div>
 
   <div class="field">
     <%= form.label :balance %>
     <%= form.text_field :balance, id: :tran_balance %>
-  </div>
-
-  <div class="field">
-    <%= form.label :user_id %>
-    <%= form.number_field :user_id, id: :tran_user_id %>
-  </div>
-
-  <div class="field">
-    <%= form.label :account_id %>
-    <%= form.number_field :account_id, id: :tran_account_id %>
   </div>
 
   <div class="actions">

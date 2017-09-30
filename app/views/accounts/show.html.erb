@@ -24,15 +24,32 @@
 <%= link_to 'Back', user_accounts_path %>
 <%= link_to 'New Transaction', new_account_tran_path(@account) %>
 
+<div>
+  My transactions starts here
+</div>
+
+<table>
+  <tr>
+    <th>Amount</th>
+    <th>credit</th>
+    <th>Balance</th>
+    <th>Tran ID</th>
+    <th>Account ID</th>
+  </tr>
     <% @trans.each do |tran| %>
       <tr>
         <td><%= tran.amount %></td>
         <td><%= tran.credit %></td>
         <td><%= tran.balance %></td>
-        <td><%= tran.user_id %></td>
+        <td><%= tran.id %></td>
         <td><%= tran.account_id %></td>
-        <td><%= link_to 'Show', tran %></td>
-        <td><%= link_to 'Edit', edit_tran_path(tran) %></td>
-        <td><%= link_to 'Destroy', tran, method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Destroy - Not working', user_account_path(@user, @account), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+
+
       </tr>
     <% end %>
+
+</table>
+
+
+

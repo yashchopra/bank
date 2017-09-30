@@ -12,7 +12,8 @@
 
 <div style="text-align: right;">
   <%= current_user.role if current_user != nil %>
-  Remove_this_code: 
+  <%= current_user.email if current_user != nil %>
+  Remove_this_code:
  <%= link_to "Sign Out", destroy_user_session_path, method: :delete %> 
 </div>
 
