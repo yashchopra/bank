@@ -30,16 +30,21 @@ class TransController < ApplicationController
   def create
     @tran = @account.trans.create(tran_params)
 
-    transfer_money(tran_params) if tran_params[:credit] == 'transfer'
-    # @tran = Tran.new(tran_params)
+    if tran_params[:credit] == 'credit'
+      @tran_mod = check_credit_conditions()
+    elsif tran_params[:credit] == 'debit'
+      @tran_mod = check_debit_conditions()
+    elsif tran_params[:credit] == 'transfer'
+      @tran_mod = transfer_money()
+    end
 
     respond_to do |format|
-      if @tran.save
-        format.html { redirect_to user_account_path(@user, @account), notice: 'Tran was successfully created.' }
-        format.json { render :show, status: :created, location: @tran }
+      if @tran_mod.save
+        format.html {redirect_to user_account_path(@user, @account), notice: 'Tran was successfully created.'}
+        format.json {render :show, status: :created, location: @tran_mod}
       else
-        format.html { render :new }
-        format.json { render json: @tran.errors, status: :unprocessable_entity }
+        format.html {render :new}
+        format.json {render json: @tran_mod.errors, status: :unprocessable_entity}
       end
     end
   end
@@ -63,40 +68,90 @@ class TransController < ApplicationController
   def destroy
     @tran.destroy
     respond_to do |format|
-      format.html { redirect_to user_account_path(@user, @account), notice: 'Account was successfully destroyed.' }
-      format.json { head :no_content }
+      format.html {redirect_to user_account_path(@user, @account), notice: 'Account was successfully destroyed.'}
+      format.json {head :no_content}
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_tran
-      @tran = Tran.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_tran
+    @tran = Tran.find(params[:id])
+  end
 
-    def set_account
-      if current_user.admin? or current_user.tier2?
-        redirect_to users_url
-      elsif current_user.customer? or current_user.organization?
-        @account = Account.find(params[:account_id])
-        @user = current_user
-      elsif current_user.tier1?
-        @user = current_user
+  def set_account
+    if current_user.admin? or current_user.tier2?
+      redirect_to users_url
+    elsif current_user.customer? or current_user.organization?
+      @account = Account.find(params[:account_id])
+      @user = current_user
+    elsif current_user.tier1?
+      @user = current_user
+    end
+  end
+
+  def transfer_money
+    # This query is used to find the account balance
+    last_transaction = Tran.where(account_id: @account.id).last(2).first.as_json
+
+    if last_transaction['balance'] > @tran[:amount]
+      if @tran[:amount] >= 100000
+        #TODO: Implement status field as pending
+      else
+        # Getting the data that was entered in form
+        reciving_account_number = @tran[:transfer_account].to_s
+        rec_acc = Account.where(accnumber: reciving_account_number)
+        # Entering the record in other persons account
+        Tran.create(:amount => @tran[:amount].to_s,
+                    :credit => 'credit',
+                    :balance => 'to be calculated',
+                    :user_id => rec_acc.as_json[0]['user_id'],
+                    :account_id => rec_acc.as_json[0]['id'],
+                    :created_at => DateTime,
+                    :updated_at => DateTime,
+                    :transfer_account => @tran[:account_id])
+        # Deducting the amount from present user balance
+        @tran[:balance] = last_transaction['balance'] - @tran[:amount]
       end
+    else
+      # TODO: Implement warning and cancel transaction condition
     end
 
-    def transfer_money(tran_params)
-      reciving_account_number = tran_params[:transfer_account].to_s
-      rec_acc = Account.where(accnumber: reciving_account_number)
-      Tran.create(:amount => rec_acc, :credit => 'credit', :balance => 'to be calculated',
-      :user_id => rec_acc.as_json[0]['user_id'], :account_id => rec_acc.as_json[0]['id'],
-      :created_at => DateTime, :updated_at => DateTime, :transfer_account => tran_params[:account_id])
+    @tran
 
+    # TODO: if account number is not found
+    # TODO: Same functionality for email and phone number search
+  end
+
+  def check_credit_conditions
+    # This query is used to find the account balance
+    last_transaction = Tran.where(account_id: @account.id).last(2).first.as_json
+    if @tran[:amount] >= 100000
+      #TODO : Implement status field as pending
+    else
+      @tran[:balance] = last_transaction['balance'] + @tran[:amount]
+    end
+    @tran
+  end
+
+  def check_debit_conditions
+    # This query is used to find the account balance
+    last_transaction = Tran.where(account_id: @account.id).last(2).first.as_json
+    if last_transaction['balance'] > @tran[:amount]
+      if @tran[:amount] >= 100000
+        #TODO: Implement status field as pending
+      else
+        @tran[:balance] = last_transaction['balance'] - @tran[:amount]
+      end
+    else
+      # TODO: Implement warning and cancel transaction condition
     end
 
+    @tran
+  end
 
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def tran_params
-      params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account)
-    end
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def tran_params
+    params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account)
+  end
 end

@@ -22,6 +22,8 @@ gem 'uglifier', '>= 1.3.0'
 # User authorization
 gem 'devise'
 
+gem 'hirb'
+
 # User session management
 gem "pundit"
 

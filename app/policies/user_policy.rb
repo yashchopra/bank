@@ -7,7 +7,7 @@ class UserPolicy
 	end
 
 	def index?
-		@current_user.admin? || @current_user.tier1? || @current_user.toer2?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 
 	# def home?
@@ -15,14 +15,14 @@ class UserPolicy
 	# end
 
 	def show?
-		@current_user.admin? || @current_user.tier1? || @current_user.toer2?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 
 	def edit?
-		@current_user.admin? || @current_user.tier1? || @current_user.toer2?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 
 	def update?
-		@current_user.admin? || @current_user.tier1? || @current_user.toer2?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 end

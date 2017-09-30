@@ -40,6 +40,7 @@ class AccountsController < ApplicationController
         format.json { render json: @account.errors, status: :unprocessable_entity }
       end
     end
+    add_initial_ammount(account_params)
   end
 
   # PATCH/PUT /accounts/1
@@ -82,6 +83,18 @@ class AccountsController < ApplicationController
         # @user = @account.user_id
       end
     end
+
+  def add_initial_ammount(account_params)
+    puts "#{account_params} $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
+    Tran.create(:amount => 2000,
+                :credit => 'credit',
+                :balance => 2000,
+                :user_id => @user.id,
+                :account_id => @account.id,
+                :created_at => DateTime,
+                :updated_at => DateTime,
+                :transfer_account => 'Initial Amount')
+  end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def account_params

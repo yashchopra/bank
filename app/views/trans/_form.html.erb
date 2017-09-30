@@ -18,7 +18,7 @@
 
   <div class="field">
     <%= form.label :credit %>
-    <%= form.select(:credit, Tran.credits.keys.map {|credit| [credit.titleize, credit]}) %>
+    <%= form.select(:credit, Tran.credits.keys.map {|credit| [credit.titleize, credit]}, id: :tran_credit) %>
   </div>
 
   <div class="field">

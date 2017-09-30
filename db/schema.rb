@@ -21,15 +21,27 @@ ActiveRecord::Schema.define(version: 20170928002120) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "financial_approvals", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
+    t.string "account_number"
+    t.decimal "amount", precision: 10
+    t.integer "status"
+    t.integer "user_id"
+    t.integer "account_id"
+    t.integer "transaction_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "trans", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.decimal "amount", precision: 10
-    t.string "credit"
+    t.integer "credit"
     t.decimal "balance", precision: 10
     t.integer "user_id"
     t.integer "account_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "transfer_account"
+    t.integer "status"
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|

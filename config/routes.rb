@@ -1,4 +1,5 @@
 Rails.application.routes.draw do
+  resources :financial_approvals
   # resources :trans
   # resources :accounts
   devise_for :users
