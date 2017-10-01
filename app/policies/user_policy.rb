@@ -6,13 +6,14 @@ class UserPolicy
 		@user = model
 	end
 
-	def index?
+	def destroy?
+		return false if @current_user == @user
 		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 
-	# def home?
-	# 	@current_user == @user
-	# end
+	def index?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
+	end
 
 	def show?
 		@current_user.admin? || @current_user.tier1? || @current_user.tier2?

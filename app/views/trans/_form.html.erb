@@ -1,5 +1,6 @@
 <%= form_with(model: [@account, tran], local: true) do |form| %>
   <% if tran.errors.any? %>
+  <% puts "#{tran.errors.any?} $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$" %>
     <div id="error_explanation">
       <h2><%= pluralize(tran.errors.count, "error") %> prohibited this tran from being saved:</h2>
 

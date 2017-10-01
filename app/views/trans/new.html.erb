@@ -2,4 +2,4 @@
 
 <%= render 'form', tran: @tran %>
 
-<%= link_to 'Back', account_trans_path %>
+<%= link_to 'Back', user_account_path(current_user, @account) %>

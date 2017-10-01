@@ -5,10 +5,13 @@ class TransController < ApplicationController
 
   # GET /trans
   # GET /trans.json
-  # def index
-  #   # @trans = Tran.all
-  #   @trans = @account.trans.all
-  # end
+  def index
+    if current_user.tier1?
+      @trans = Tran.where(status: 'pending')
+    else
+      user_not_authorized and return
+    end
+  end
 
   # GET /trans/1
   # GET /trans/1.json
@@ -94,27 +97,23 @@ class TransController < ApplicationController
     # This query is used to find the account balance
     last_transaction = Tran.where(account_id: @account.id).last(2).first.as_json
 
-    if last_transaction['balance'] > @tran[:amount]
-      if @tran[:amount] >= 100000
-        #TODO: Implement status field as pending
-      else
-        # Getting the data that was entered in form
-        reciving_account_number = @tran[:transfer_account].to_s
-        rec_acc = Account.where(accnumber: reciving_account_number)
-        # Entering the record in other persons account
-        Tran.create(:amount => @tran[:amount].to_s,
-                    :credit => 'credit',
-                    :balance => 'to be calculated',
-                    :user_id => rec_acc.as_json[0]['user_id'],
-                    :account_id => rec_acc.as_json[0]['id'],
-                    :created_at => DateTime,
-                    :updated_at => DateTime,
-                    :transfer_account => @tran[:account_id])
-        # Deducting the amount from present user balance
-        @tran[:balance] = last_transaction['balance'] - @tran[:amount]
-      end
+    if @tran[:amount] >= 100000
+      @tran[:status] = "Pending"
     else
-      # TODO: Implement warning and cancel transaction condition
+      # Getting the data that was entered in form
+      reciving_account_number = @tran[:transfer_account].to_s
+      rec_acc = Account.where(accnumber: reciving_account_number)
+      # Entering the record in other persons account
+      Tran.create(:amount => @tran[:amount].to_s,
+                  :credit => 'credit',
+                  :balance => 'to be calculated',
+                  :user_id => rec_acc.as_json[0]['user_id'],
+                  :account_id => rec_acc.as_json[0]['id'],
+                  :created_at => DateTime,
+                  :updated_at => DateTime,
+                  :transfer_account => @tran[:account_id])
+      # Deducting the amount from present user balance
+      @tran[:balance] = last_transaction['balance'] - @tran[:amount]
     end
 
     @tran
@@ -127,7 +126,7 @@ class TransController < ApplicationController
     # This query is used to find the account balance
     last_transaction = Tran.where(account_id: @account.id).last(2).first.as_json
     if @tran[:amount] >= 100000
-      #TODO : Implement status field as pending
+      @tran[:status] = "Pending"
     else
       @tran[:balance] = last_transaction['balance'] + @tran[:amount]
     end
@@ -137,15 +136,13 @@ class TransController < ApplicationController
   def check_debit_conditions
     # This query is used to find the account balance
     last_transaction = Tran.where(account_id: @account.id).last(2).first.as_json
-    if last_transaction['balance'] > @tran[:amount]
-      if @tran[:amount] >= 100000
-        #TODO: Implement status field as pending
-      else
-        @tran[:balance] = last_transaction['balance'] - @tran[:amount]
-      end
+
+    if @tran[:amount] >= 100000
+      @tran[:status] = "Pending"
     else
-      # TODO: Implement warning and cancel transaction condition
+      @tran[:balance] = last_transaction['balance'] - @tran[:amount]
     end
+
 
     @tran
   end

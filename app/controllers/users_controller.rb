@@ -15,16 +15,16 @@ class UsersController < ApplicationController
 		authorize User
 	end
 
-	def show
-		@user = User.find(params[:id])
-		authorize @user
-	end
+	# def show
+	# 	@user = User.find(params[:id])
+	# 	authorize @user
+	# end
 
 	def destroy
 		user = User.find(params[:id])
 		authorize user
 		user.destroy
-		redirect_to user_path, :notice => "User deleted"
+		redirect_to users_url, :notice => "User deleted"
 	end
 
 	def edit

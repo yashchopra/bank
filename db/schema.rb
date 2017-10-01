@@ -10,24 +10,13 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20170928002120) do
+ActiveRecord::Schema.define(version: 20170930102413) do
 
   create_table "accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "acctype"
     t.string "accnumber"
     t.string "accrouting"
     t.integer "user_id"
-    t.datetime "created_at", null: false
-    t.datetime "updated_at", null: false
-  end
-
-  create_table "financial_approvals", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
-    t.string "account_number"
-    t.decimal "amount", precision: 10
-    t.integer "status"
-    t.integer "user_id"
-    t.integer "account_id"
-    t.integer "transaction_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end

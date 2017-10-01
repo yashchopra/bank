@@ -1,25 +1,33 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Bank</title>
-    <%= csrf_meta_tags %>
+<head>
+  <title>Bank</title>
+  <%= csrf_meta_tags %>
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-  </head>
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+</head>
 
-  <body>
+<body>
 
 <div style="text-align: right;">
-  <%= current_user.role if current_user != nil %>
-  <%= current_user.email if current_user != nil %>
+  <%= current_user.role if current_user %>
+  <%= current_user.email if current_user %>
   Remove_this_code:
- <%= link_to "Sign Out", destroy_user_session_path, method: :delete %> 
+  <%= link_to "Sign Out", destroy_user_session_path, method: :delete %>
 </div>
 
-  	<p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
+<nav>
+  <% if current_user %>
+      <% if current_user.tier1? %>
+          <%= link_to "Financial Requests", account_trans_path(Account) %>
+      <% end %>
+  <% end %>
+</nav>
 
-    <%= yield %>
-  </body>
+<p class="notice"><%= notice %></p>
+<p class="alert"><%= alert %></p>
+
+<%= yield %>
+</body>
 </html>
