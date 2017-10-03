@@ -79,7 +79,7 @@ class AccountsController < ApplicationController
       elsif current_user.customer? or current_user.organization?
         @user = current_user
       elsif current_user.tier1?
-        @user = current_user
+        @user = User.find(params[:user_id])
         # @user = @account.user_id
       end
     end

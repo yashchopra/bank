@@ -3,3 +3,18 @@
       <td><%= tran.amount %></td>
     </tr>
 <% end %>
+
+<div>
+  <table>
+    <tr>
+      <th> Manage users</th>
+    </tr>
+      <% @user.each do |user| %>
+        <tr>
+          <td>
+            <%= link_to "#{user.email}", user_accounts_path(user.id) %>
+          </td>
+        </tr>
+      <% end %>
+  </table>
+</div>

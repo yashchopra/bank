@@ -8,6 +8,7 @@ class TransController < ApplicationController
   def index
     if current_user.tier1?
       @trans = Tran.where(status: 'pending')
+      @user = User.where(role: 'customer').or(User.where(role: 'customer'))
     else
       user_not_authorized and return
     end
@@ -89,6 +90,7 @@ class TransController < ApplicationController
       @account = Account.find(params[:account_id])
       @user = current_user
     elsif current_user.tier1?
+      @account = Account.find(params[:account_id]) if  params[:account_id].scan(/\D/).empty?
       @user = current_user
     end
   end
