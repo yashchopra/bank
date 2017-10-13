@@ -4,6 +4,24 @@
     </tr>
 <% end %>
 
+
+
+
+
+<% @trans.each do |tran| %>
+    <table>
+      <tbody>
+      <tr>
+        <td><%= render tran, account: Account.find_by(id: tran.account_id) %></td>
+      </tr>
+      </tbody>
+    </table>
+<% end %>
+
+
+
+
+
 <div>
   <table>
     <tr>
@@ -18,3 +36,4 @@
       <% end %>
   </table>
 </div>
+

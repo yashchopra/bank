@@ -1,0 +1,5 @@
+
+<%= form_for([account, tran]) do |f| %>
+    <%= f.select(:status, Tran.statuses.keys.map {|status| [status.titleize, status]})%>
+    <button> <%= f.submit 'Update info'%> </button>
+<% end %>

@@ -27,10 +27,10 @@ class UsersController < ApplicationController
 		redirect_to users_url, :notice => "User deleted"
 	end
 
-	def edit
-		authorize User
-		@users = User.all
-	end
+	# def edit
+	# 	authorize User
+	# 	@users = User.all
+	# end
 
 	def update
 		@user = User.find(params[:id])

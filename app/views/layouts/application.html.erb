@@ -20,6 +20,7 @@
 <nav>
   <% if current_user %>
       <% if current_user.tier1? %>
+          <%= link_to "Users", users_url %>
           <%= link_to "Financial Requests", account_trans_path(Account) %>
       <% end %>
   <% end %>

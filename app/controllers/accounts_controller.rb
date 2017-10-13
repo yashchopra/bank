@@ -85,7 +85,6 @@ class AccountsController < ApplicationController
     end
 
   def add_initial_ammount(account_params)
-    puts "#{account_params} $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$"
     Tran.create(:amount => 2000,
                 :credit => 'credit',
                 :balance => 2000,

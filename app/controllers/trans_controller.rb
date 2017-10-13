@@ -8,7 +8,7 @@ class TransController < ApplicationController
   def index
     if current_user.tier1?
       @trans = Tran.where(status: 'pending')
-      @user = User.where(role: 'customer').or(User.where(role: 'customer'))
+      @user = User.where(role: 'customer').or(User.where(role: 'organization'))
     else
       user_not_authorized and return
     end
@@ -55,17 +55,19 @@ class TransController < ApplicationController
 
   # PATCH/PUT /trans/1
   # PATCH/PUT /trans/1.json
-  # def update
-  #   respond_to do |format|
-  #     if @tran.update(tran_params)
-  #       format.html { redirect_to account_tran_path(@account, @tran), notice: 'Tran was successfully updated.' }
-  #       format.json { render :show, status: :ok, location: @tran }
-  #     else
-  #       format.html { render :edit }
-  #       format.json { render json: @tran.errors, status: :unprocessable_entity }
-  #     end
-  #   end
-  # end
+  def update
+    @tran = Tran.find(params[:id])
+    respond_to do |format|
+      if @tran.update(tran_params)
+        format.html {redirect_to account_trans_path(Account), notice: 'Tran was successfully updated.'}
+        format.json {render :show, status: :ok, location: @tran}
+        change_status(tran_params)
+      else
+        format.html {render :edit}
+        format.json {render json: @tran.errors, status: :unprocessable_entity}
+      end
+    end
+  end
 
   # DELETE /trans/1
   # DELETE /trans/1.json
@@ -90,7 +92,7 @@ class TransController < ApplicationController
       @account = Account.find(params[:account_id])
       @user = current_user
     elsif current_user.tier1?
-      @account = Account.find(params[:account_id]) if  params[:account_id].scan(/\D/).empty?
+      @account = Account.find(params[:account_id]) if params[:account_id].scan(/\D/).empty?
       @user = current_user
     end
   end
@@ -100,7 +102,8 @@ class TransController < ApplicationController
     last_transaction = Tran.where(account_id: @account.id).last(2).first.as_json
 
     if @tran[:amount] >= 100000
-      @tran[:status] = "Pending"
+      @tran[:status] = "pending"
+      @tran[:balance] = last_transaction['balance'] - @tran[:amount]
     else
       # Getting the data that was entered in form
       reciving_account_number = @tran[:transfer_account].to_s
@@ -126,31 +129,41 @@ class TransController < ApplicationController
 
   def check_credit_conditions
     # This query is used to find the account balance
-    last_transaction = Tran.where(account_id: @account.id).last(2).first.as_json
-    if @tran[:amount] >= 100000
-      @tran[:status] = "Pending"
-    else
-      @tran[:balance] = last_transaction['balance'] + @tran[:amount]
-    end
+    last_transaction = Tran.where(account_id: @account.id).last(2).first
+    @tran[:balance] = last_transaction[:balance] + @tran[:amount]
     @tran
   end
 
   def check_debit_conditions
     # This query is used to find the account balance
-    last_transaction = Tran.where(account_id: @account.id).last(2).first.as_json
-
-    if @tran[:amount] >= 100000
-      @tran[:status] = "Pending"
-    else
-      @tran[:balance] = last_transaction['balance'] - @tran[:amount]
-    end
-
-
+    last_transaction = Tran.where(account_id: @account.id).last(2).first
+    @tran[:balance] = last_transaction[:balance] - @tran[:amount]
     @tran
+  end
+
+  def change_status(updated_info)
+    if updated_info[:status] == 'approve'
+      account_to_transfer = Tran.find_by(id: params[:id])[:transfer_account]
+    elsif updated_info[:status] == 'decline'
+      account_to_transfer = Tran.find_by(id: params[:id])[:account_id]
+    end
+    if updated_info[:status] != 'pending'
+      rec_acc = Account.where(accnumber: account_to_transfer)
+      last_transaction = Tran.where(account_id: rec_acc[0][:id]).last(2).first
+
+      Tran.create(:amount => @tran[:amount].to_s,
+                  :credit => 'transfer',
+                  :balance => last_transaction[:balance] + @tran[:amount],
+                  :user_id => rec_acc[0]['user_id'],
+                  :account_id => rec_acc[0]['id'],
+                  :created_at => DateTime,
+                  :updated_at => DateTime,
+                  :transfer_account => @tran[:account_id])
+    end
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def tran_params
-    params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account)
+    params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status)
   end
 end

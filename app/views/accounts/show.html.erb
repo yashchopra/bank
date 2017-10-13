@@ -43,7 +43,7 @@
         <td><%= tran.balance %></td>
         <td><%= tran.id %></td>
         <td><%= tran.account_id %></td>
-        <td><%= link_to 'Destroy - Not working', user_account_path(@user, @account), method: :delete, data: { confirm: 'Are you sure?' } %></td>
+        <td><%= link_to 'Destroy', account_tran_path(@account, tran), method: :delete, data: { confirm: 'Are you sure?' } %></td>
 
 
       </tr>
