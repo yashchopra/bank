@@ -19,6 +19,10 @@ class AccountsController < ApplicationController
   # GET /accounts/new
   def new
     @account = @user.accounts.new
+    @account_types = ['Checking','Savings','Credit Card']
+    @user.accounts.all.pluck(:acctype).each do |type|
+      @account_types.delete(type)
+      end
   end
 
   # GET /accounts/1/edit
