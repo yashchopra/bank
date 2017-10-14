@@ -1,55 +1,63 @@
 <p id="notice"><%= notice %></p>
 
-<p>
-  <strong>Acctype:</strong>
-  <%= @account.acctype %>
-</p>
+<div class="container">
+  <div class="row">
+    <div class="col m12 offset-m0">
 
-<p>
-  <strong>Accnumber:</strong>
-  <%= @account.accnumber %>
-</p>
+      <table>
+        <tbody>
+        <tr>
+          <td>
+            <strong>Acctype:</strong>
+            <%= @account.acctype %>
+          </td>
+          <td>
+            <strong>Accnumber:</strong>
+            <%= @account.accnumber %>
+          </td>
+          <td>
+            <strong>Accrouting:</strong>
+            <%= @account.accrouting %>
+          </td>
+          <td>
+            <strong>User:</strong>
+            <%= @account.user_id %>
+          </td>
 
-<p>
-  <strong>Accrouting:</strong>
-  <%= @account.accrouting %>
-</p>
+          <td>
+            <button class="waves-effect waves-light btn"> <%= link_to 'Back to Accounts', user_accounts_path %> </button>
+          </td>
+          <td>
+            <button class="waves-effect waves-light btn"> <%= link_to 'New Transaction', new_account_tran_path(@account) %> </button>
+          </td>
+        </tr>
+        </tbody>
+      </table>
 
-<p>
-  <strong>User:</strong>
-  <%= @account.user_id %>
-</p>
 
-<%= link_to 'Edit', edit_user_account_path(@user, @account) %> |
-<%= link_to 'Back', user_accounts_path %>
-<%= link_to 'New Transaction', new_account_tran_path(@account) %>
+      <table class="highlight">
+        <thead>
+        <tr>
+          <th>Amount</th>
+          <th>Transaction Type</th>
+          <th>Balance</th>
+        </tr>
+        </thead>
 
-<div>
-  My transactions starts here
+        <tbody>
+        <% @trans.each do |tran| %>
+            <tr>
+              <td><%= tran.amount %></td>
+              <td><%= tran.credit %></td>
+              <td><%= tran.balance %></td>
+              <td><%= link_to 'Destroy', account_tran_path(@account, tran), method: :delete, data: {confirm: 'Are you sure?'} %></td>
+            </tr>
+        <% end %>
+        </tbody>
+
+      </table>
+
+    </div>
+  </div>
 </div>
-
-<table>
-  <tr>
-    <th>Amount</th>
-    <th>credit</th>
-    <th>Balance</th>
-    <th>Tran ID</th>
-    <th>Account ID</th>
-  </tr>
-    <% @trans.each do |tran| %>
-      <tr>
-        <td><%= tran.amount %></td>
-        <td><%= tran.credit %></td>
-        <td><%= tran.balance %></td>
-        <td><%= tran.id %></td>
-        <td><%= tran.account_id %></td>
-        <td><%= link_to 'Destroy', account_tran_path(@account, tran), method: :delete, data: { confirm: 'Are you sure?' } %></td>
-
-
-      </tr>
-    <% end %>
-
-</table>
-
-
 

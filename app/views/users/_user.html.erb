@@ -1,8 +1,8 @@
-<%= user.email %>
 <%= form_for(user) do |f| %>
 
-    <%= f.select(:role, User.roles.keys.map {|role| [role.titleize, role]}) %>
-    <button> <%= f.submit 'Update info' %> </button>
-    <button> <%= link_to 'Destroy', user_path(user), method: :delete, data: {confirm: 'Are you sure?'} %> </button>
-
+    <%= f.select :role, User.roles.keys.map {|role| [role.titleize, role]} %>
+    <div class="btn waves-effect waves-light" type="submit" name="action">
+      <%= f.submit 'Update info' %>
+    </div>
+    <%= link_to 'Destroy', user_path(user), method: :delete, data: {confirm: 'Are you sure?'} %>
 <% end %>

@@ -1,5 +1,13 @@
-<h1>New Tran</h1>
 
-<%= render 'form', tran: @tran %>
+<div class="container">
+  <div class="row">
+    <div class="col m8 offset-m2">
+      <h5 class="black-text">New Transaction</h5>
 
-<%= link_to 'Back', user_account_path(current_user, @account) %>
+      <%= render 'form', tran: @tran %>
+      <br>
+
+      <button class="waves-effect waves-light btn"> <%= link_to 'Back to Account', user_account_path(current_user, @account) %> </button>
+    </div>
+  </div>
+</div>

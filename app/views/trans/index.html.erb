@@ -4,36 +4,36 @@
     </tr>
 <% end %>
 
+<div style="width: 100%;overflow:auto;">
+
+  <div style="float:left; width: 70%">
+    <% @trans.each do |tran| %>
+        <table>
+          <tbody>
+          <tr>
+            <td><%= render tran, account: Account.find_by(id: tran.account_id) %></td>
+          </tr>
+          </tbody>
+        </table>
+    <% end %>
+  </div>
 
 
-
-
-<% @trans.each do |tran| %>
-    <table>
-      <tbody>
-      <tr>
-        <td><%= render tran, account: Account.find_by(id: tran.account_id) %></td>
-      </tr>
-      </tbody>
-    </table>
-<% end %>
-
-
-
-
-
-<div>
-  <table>
+  <div style="float:right; width: 30%">
+    <table class="highlight">
+    <thead>
     <tr>
       <th> Manage users</th>
     </tr>
-      <% @user.each do |user| %>
-        <tr>
-          <td>
-            <%= link_to "#{user.email}", user_accounts_path(user.id) %>
-          </td>
-        </tr>
-      <% end %>
-  </table>
-</div>
+    </thead>
 
+    <tbody>
+    <% @user.each do |user| %>
+        <tr> <td> <%= link_to "#{user.email}", user_accounts_path(user.id) %> </td> </tr>
+    <% end %>
+
+    </tbody>
+    </table>
+  </div>
+
+</div>
