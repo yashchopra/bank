@@ -1,3 +1,10 @@
+<script>
+    $(document).ready(function() {
+        $('select').material_select();
+    });
+
+</script>
+
 <div class="container">
   <div class="row">
     <div class="col m12 offset-m0">
@@ -14,7 +21,7 @@
         <% @users.each do |user| %>
             <tr>
               <td><%= user.email %></td>
-              <td><%= render user %></td>
+              <td class="browser-default"><%= render user %></td>
             </tr>
         <% end %>
         </tbody>
