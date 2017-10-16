@@ -24,11 +24,11 @@ class UserPolicy
 	end
 
 	def edit?
-		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
+		@current_user == @user
 	end
 
 	def update?
-		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2? || @current_user == @user
 	end
 
 	def create?

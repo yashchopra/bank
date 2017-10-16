@@ -15,10 +15,10 @@ class UsersController < ApplicationController
     authorize User
   end
 
-  # def show
-  # 	@user = User.find(params[:id])
-  # 	authorize @user
-  # end
+  def edit
+  	@user = User.find(params[:id])
+  	authorize @user
+  end
 
   def destroy
     user = User.find(params[:id])
@@ -52,10 +52,10 @@ class UsersController < ApplicationController
     authorize @user
 
     if @user.update_attributes(user_params)
-      redirect_to users_path, notice: 'User was successfully updated.'
+      redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'
       # format.json { render :show, status: :ok, location: @user }
     else
-      redirect_to users_path, notice: 'User update unsuccessfull'
+      redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull'
       # format.json { render json: @account.errors, status: :unprocessable_entity }
     end
   end

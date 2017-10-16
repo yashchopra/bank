@@ -11,10 +11,9 @@
 <body>
 
 
-
 <!--<div style="text-align: right;">-->
-  <!--<%= current_user.role if current_user %>-->
-  <!--<%= current_user.email if current_user %>-->
+<!--<%= current_user.role if current_user %>-->
+<!--<%= current_user.email if current_user %>-->
 
 <!--</div>-->
 
@@ -27,10 +26,12 @@
               <li>  <%= link_to "Users", users_url %>
               <li>  <%= link_to "Financial Requests", account_trans_path(Account) %> </li>
           <% end %>
+          <li> <%= link_to "Update Profile", edit_users_admin_url(current_user) %> </li>
+          <li><%= link_to "Sign Out", destroy_user_session_path, method: :delete %></li>
+          <li> <%= link_to "New User", new_users_admin_path %> </li>
       <% end %>
-      <li> <%= link_to "New User", new_users_admin_path %> </li>
 
-      <li><%= link_to "Sign Out", destroy_user_session_path, method: :delete if current_user%></li>
+
 
     </ul>
   </div>
