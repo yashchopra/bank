@@ -23,8 +23,15 @@ class TransController < ApplicationController
   def new
     # @tran = Tran.new
     @tran = @account.trans.new
-  end
 
+    if User.find_by(id: @account[:user_id]).organization?
+      @tran_types = ['credit','debit','request']
+    else
+      @tran_types = ['credit','debit','transfer']
+    end
+    @tran_types
+  end
+``
   # GET /trans/1/edit
   # def edit
   # end
@@ -40,6 +47,8 @@ class TransController < ApplicationController
       @tran_mod = check_debit_conditions()
     elsif tran_params[:credit] == 'transfer'
       @tran_mod = transfer_money()
+    elsif tran_params[:credit] == 'request'
+      @tran_mod = request_money()
     end
 
     respond_to do |format|
@@ -139,6 +148,10 @@ class TransController < ApplicationController
     last_transaction = Tran.where(account_id: @account.id).last(2).first
     @tran[:balance] = last_transaction[:balance] - @tran[:amount]
     @tran
+  end
+
+  def request_money()
+
   end
 
   def change_status(updated_info)

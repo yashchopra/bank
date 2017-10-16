@@ -1,3 +1,9 @@
+<script>
+    $(document).ready(function () {
+        $('select').material_select();
+    });
+</script>
+
 <% @trans.each do |tran| %>
     <tr>
       <td><%= tran.amount %></td>
@@ -21,18 +27,20 @@
 
   <div style="float:right; width: 30%">
     <table class="highlight">
-    <thead>
-    <tr>
-      <th> Manage users</th>
-    </tr>
-    </thead>
+      <thead>
+      <tr>
+        <th> Manage users</th>
+      </tr>
+      </thead>
 
-    <tbody>
-    <% @user.each do |user| %>
-        <tr> <td> <%= link_to "#{user.email}", user_accounts_path(user.id) %> </td> </tr>
-    <% end %>
+      <tbody>
+      <% @user.each do |user| %>
+          <tr>
+            <td> <%= link_to "#{user.email}", user_accounts_path(user.id) %> </td>
+          </tr>
+      <% end %>
 
-    </tbody>
+      </tbody>
     </table>
   </div>
 

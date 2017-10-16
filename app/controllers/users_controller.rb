@@ -27,10 +27,29 @@ class UsersController < ApplicationController
     redirect_to users_url, :notice => "User deleted"
   end
 
+  def new
+    @user = User.new
+    authorize @user
+  end
   # def edit
   # 	authorize User
   # 	@users = User.all
   # end
+
+  def create
+    @user = User.new(user_params)
+    authorize current_user
+
+    respond_to do |format|
+      if @user.save
+        format.html {redirect_to users_url, notice: 'Tran was successfully created.'}
+        format.json {render :show, status: :created, location: @tran_mod}
+      else
+        format.html {render :new}
+        format.json {render json: @tran_mod.errors, status: :unprocessable_entity}
+      end
+    end
+  end
 
   def update
     @user = User.find(params[:id])
@@ -46,7 +65,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:role, :email)
+    params.require(:user).permit(:role, :email, :password, :password_confirmation)
   end
 
   def correct_user_list

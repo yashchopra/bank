@@ -11,6 +11,10 @@ class UserPolicy
 		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 
+	def new?
+		@current_user.admin? || @current_user.tier1?
+	end
+
 	def index?
 		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
@@ -24,6 +28,10 @@ class UserPolicy
 	end
 
 	def update?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
+	end
+
+	def create?
 		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 end

@@ -19,7 +19,12 @@ class AccountsController < ApplicationController
   # GET /accounts/new
   def new
     @account = @user.accounts.new
-    @account_types = ['Checking','Savings','Credit Card']
+    if @user.organization?
+      @account_types = ['Checking']
+    else
+      @account_types = ['Checking','Savings','Credit Card']
+    end
+
     @user.accounts.all.pluck(:acctype).each do |type|
       @account_types.delete(type)
       end
