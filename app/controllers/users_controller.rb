@@ -31,10 +31,6 @@ class UsersController < ApplicationController
     @user = User.new
     authorize @user
   end
-  # def edit
-  # 	authorize User
-  # 	@users = User.all
-  # end
 
   def create
     @user = User.new(user_params)
@@ -65,7 +61,7 @@ class UsersController < ApplicationController
   end
 
   def user_params
-    params.require(:user).permit(:role, :email, :password, :password_confirmation)
+    params.require(:user).permit(:role, :email, :password, :password_confirmation, :phone, :first_name, :last_name, :city, :state, :country, :street, :zip)
   end
 
   def correct_user_list

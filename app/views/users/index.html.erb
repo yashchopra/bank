@@ -3,31 +3,29 @@
         $('select').material_select();
     });
 
+    $(document).ready(function(){
+        $('.collapsible').collapsible();
+    });
 </script>
+
 
 <div class="container">
   <div class="row">
     <div class="col m12 offset-m0">
       <h5 class="black-text">All users Profile</h5>
 
-      <table class="highlight">
-        <thead>
-        <tr>
-          <th>Email</th>
-          <th>Role</th>
-        </tr>
-        </thead>
-        <tbody>
         <% @users.each do |user| %>
-            <tr>
-              <td><%= user.email %></td>
-              <td class="browser-default"><%= render user %></td>
-            </tr>
+            <ul class="collapsible" data-collapsible="accordion">
+              <li>
+                <div class="collapsible-header">
+                  <%= user.first_name %>
+                  <%= user.last_name %>
+                </div>
+                <div class="collapsible-body"><span> <%= render user %> </span></div>
+              </li>
+            </ul>
         <% end %>
-        </tbody>
-      </table>
     </div>
   </div>
 </div>
 
-<%= link_to "New User", new_users_admin_path, class: 'button' %>

@@ -28,6 +28,7 @@
               <li>  <%= link_to "Financial Requests", account_trans_path(Account) %> </li>
           <% end %>
       <% end %>
+      <li> <%= link_to "New User", new_users_admin_path %> </li>
 
       <li><%= link_to "Sign Out", destroy_user_session_path, method: :delete if current_user%></li>
 
