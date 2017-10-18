@@ -189,7 +189,7 @@ Devise.setup do |config|
   # is failed attempts.
   config.maximum_attempts = 2
 
-  config.timeout_in = 10.seconds
+  config.timeout_in = 120.seconds
 
   # Time interval to unlock the account if :time is enabled as unlock_strategy.
   # config.unlock_in = 1.hour
@@ -276,4 +276,12 @@ Devise.setup do |config|
   # When using OmniAuth, Devise cannot automatically set OmniAuth path,
   # so you need to do it manually. For the users scope, it would be:
   # config.omniauth_path_prefix = '/my_engine/users/auth'
+  config.max_login_attempts = 13  # Maximum second factor attempts count.
+  config.allowed_otp_drift_seconds = 30  # Allowed TOTP time drift between client and server.
+  config.otp_length = 6  # TOTP code length
+  config.direct_otp_valid_for = 1.minutes  # Time before direct OTP becomes invalid
+  config.direct_otp_length = 6  # Direct OTP code length
+  config.remember_otp_session_for_seconds = 0.days  # Time before browser has to perform 2fA again. Default is 0.
+  config.otp_secret_encryption_key = ENV['OTP_SECRET_ENCRYPTION_KEY']
+  config.second_factor_resource_id = 'id' # Field or method name used to set value for 2fA remember cookie
 end

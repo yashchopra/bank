@@ -52,6 +52,12 @@ en:
       send_instructions: "You will receive an email with instructions for how to unlock your account in a few minutes."
       send_paranoid_instructions: "If your account exists, you will receive an email with instructions for how to unlock it in a few minutes."
       unlocked: "Your account has been unlocked successfully. Please sign in to continue."
+    two_factor_authentication:
+      #success: "Two factor authentication successful."
+      attempt_failed: "Attempt failed."
+      max_login_attempts_reached: "Access completely denied as you have reached your attempts limit"
+      contact_administrator: "Please contact your system administrator."
+      code_has_been_sent: "Your authentication code has been sent."
   errors:
     messages:
       already_confirmed: "was already confirmed, please try signing in"

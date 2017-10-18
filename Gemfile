@@ -26,6 +26,8 @@ gem 'devise'
 
 # Jquery
 gem 'jquery-rails'
+gem 'two_factor_authentication'
+gem 'hirb'
 # User session management
 gem "pundit"
 
