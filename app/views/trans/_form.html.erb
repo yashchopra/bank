@@ -1,37 +1,33 @@
 <%= form_with(model: [@account, tran], local: true) do |form| %>
-  <% if tran.errors.any? %>
-    <div id="error_explanation">
-      <h2><%= pluralize(tran.errors.count, "error") %> prohibited this tran from being saved:</h2>
+    <% if tran.errors.any? %>
+        <div id="error_explanation">
+          <h2><%= pluralize(tran.errors.count, "error") %> prohibited this tran from being saved:</h2>
 
-      <ul>
-      <% tran.errors.full_messages.each do |message| %>
-        <li><%= message %></li>
-      <% end %>
-      </ul>
+          <ul>
+            <% tran.errors.full_messages.each do |message| %>
+                <ul><%= message %></ul>
+            <% end %>
+          </ul>
+        </div>
+    <% end %>
+
+    <div class="field">
+      <%= form.label :amount %>
+      <%= form.text_field :amount, id: :tran_amount %>
     </div>
-  <% end %>
 
-  <div class="field">
-    <%= form.label :amount %>
-    <%= form.text_field :amount, id: :tran_amount %>
-  </div>
+    <div class="field">
+      <%= form.label :credit %>
+      <%= form.select(:credit, Tran.credits.keys.map {|credit| [credit.titleize, credit]}, id: :tran_credit) %>
+    </div>
 
-  <div class="field">
-    <%= form.label :credit %>
-    <%= form.select(:credit, @tran_types, {:include_blank => 'Select a Transaction Type'},:required => true) %>
-  </div>
+    <div class="field">
+      <%= form.label :transfer_account %>
+      <%= form.text_field :transfer_account, id: :tran_transfer_account %>
+    </div>
 
-  <div class="field">
-    <%= form.label :transfer_account %>
-    <%= form.text_field :transfer_account, id: :tran_transfer_account %>
-  </div>
 
-  <div class="field">
-    <%= form.label :balance %>
-    <%= form.text_field :balance, id: :tran_balance %>
-  </div>
-
-  <div class="btn waves-effect waves-light" type="submit" name="action">
-    <%= form.submit %>
-  </div>
+    <div class="btn waves-effect waves-light" type="submit" name="action">
+      <%= form.submit %>
+    </div>
 <% end %>

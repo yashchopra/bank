@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171014021356) do
+ActiveRecord::Schema.define(version: 20171016015240) do
 
   create_table "accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "acctype"
@@ -57,6 +57,14 @@ ActiveRecord::Schema.define(version: 20171014021356) do
     t.string "direct_otp"
     t.datetime "direct_otp_sent_at"
     t.timestamp "totp_timestamp"
+    t.string "phone"
+    t.string "first_name"
+    t.string "last_name"
+    t.string "city"
+    t.string "state"
+    t.string "country"
+    t.string "street"
+    t.string "zip"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["encrypted_otp_secret_key"], name: "index_users_on_encrypted_otp_secret_key", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
