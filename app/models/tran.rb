@@ -3,35 +3,61 @@ class Tran < ApplicationRecord
   enum credit: [:credit, :debit, :transfer, :request]
   enum status: [:pending, :approve, :decline]
 
-  # validates_presence_of :amount
-  # before_create :deductible_amount, :if => :transaction_type_is_transfer_or_debit?
-  # before_validation :transfer_account_present, :if => :transaction_type_is_transfer?
+  validates_presence_of :amount
+  validate :amount_type
+  validate :deductible_amount, :if => :transaction_type_is_transfer_or_debit?
 
-  # def transaction_type_is_transfer_or_debit?
-  #   true if credit == ("debit" or "transfer")
-  # end
-  #
-  # def deductible_amount
-  #   last_transaction = Tran.where(account_id.to_s).last.as_json
-  #   if last_transaction['id'] != id and amount > last_transaction['balance']
-  #     errors.add(:amount, "Amount can't be greater than your balance. Your current balance is #{last_transaction['balance']}")
-  #   end
-  # end
-  #
-  # def transaction_type_is_transfer?
-  #   true if credit == 'transfer'
-  # end
 
-  # def transfer_account_present
-  #   if transfer_account.present?
-  #     @account =  Account.where(accnumber: transfer_account)
-  #     # .or (USER.where(email: transfer_account))
-  #     if !@account
-  #       errors.add(:transfer_account, "Account number / email / Phone number not found.")
-  #     end
-  #   else
-  #     errors.add(:transfer_account, "Account number / email / Phone number can not be blank")
-  #   end
-  # end
+  validates_presence_of :transfer_account, :if => :transaction_type_is_transfer_or_request?
+  validate :transfer_account_conditions, :if => :transaction_type_is_transfer_or_request?
+
+
+  def amount_type
+    if amount <= 0
+      errors.add(:amount, "invalid")
+    end
+  end
+
+  def transaction_type_is_transfer_or_request?
+    true if ["request", "transfer"].include? credit
+  end
+
+  def transaction_type_is_transfer_or_debit?
+    true if ["debit", "transfer"].include? credit
+  end
+
+  def deductible_amount
+    last_transaction = Tran.where(account_id.to_s).last.as_json
+    if last_transaction['id'] != id and amount > last_transaction['balance']
+      errors.add(:amount, "Amount can't be greater than your balance. Your current balance is #{last_transaction['balance']}")
+    end
+  end
+
+  def transfer_account_conditions
+
+    account_to_transfer_exist = (Account.exists?(accnumber: transfer_account) or (User.exists?(email: transfer_account)) or (User.exists?(phone: transfer_account)))
+    if !account_to_transfer_exist
+      errors.add(:transfer_account, "Account number / email / Phone number not found.")
+    end
+
+    if account_to_transfer_exist && transfer_himself
+      errors.add(:transfer_account, "You can not send or recieve money from yourself")
+    end
+
+  end
+
+  def transfer_himself
+    same_account = false
+    user_account = Account.find(account_id)
+    user = User.find(user_account[:user_id])
+    if transfer_account.include? '@'
+      same_account = true if user[:email] == transfer_account
+    elsif transfer_account.length == 10
+      same_account = true if user[:phone] == transfer_account
+    elsif transfer_account.length == 12
+      same_account = true if user_account[:accnumber] == transfer_account
+    end
+    same_account
+  end
 
 end
