@@ -12,7 +12,7 @@ class User < ApplicationRecord
 	end
 
 
-  devise :database_authenticatable, :registerable, :recoverable, :trackable, :validatable, :two_factor_authenticatable, :lockable, :timeoutable, :password_expirable
+  devise :database_authenticatable, :registerable, :recoverable, :trackable, :validatable, :two_factor_authenticatable, :lockable, :timeoutable
 	has_one_time_password(encrypted: true)
 
 	def send_two_factor_authentication_code(code)
@@ -20,4 +20,5 @@ class User < ApplicationRecord
 		@code = code
 		UserMailer.signup_confirmation(email, @code).deliver
 	end
+
 end
