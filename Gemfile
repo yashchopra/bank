@@ -45,6 +45,9 @@ gem 'bcrypt', platforms: :ruby
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
 
+gem 'devise_security_extension', :path => "lib/gems/devise_security_extension-0.9.2"
+gem 'rails_email_validator'
+
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
   gem 'byebug', platforms: [:mri, :mingw, :x64_mingw]
@@ -64,3 +67,4 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+

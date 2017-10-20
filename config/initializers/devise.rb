@@ -284,4 +284,42 @@ Devise.setup do |config|
   config.remember_otp_session_for_seconds = 0.days  # Time before browser has to perform 2fA again. Default is 0.
   config.otp_secret_encryption_key = ENV['OTP_SECRET_ENCRYPTION_KEY']
   config.second_factor_resource_id = 'id' # Field or method name used to set value for 2fA remember cookie
+
+  # ==> Security Extension
+  # Configure security extension for devise
+
+  # Should the password expire (e.g 3.months)
+  config.expire_password_after =10.minutes
+
+  # Need 1 char of A-Z, a-z and 0-9
+  # config.password_regex = /(?=.*\d)(?=.*[a-z])(?=.*[A-Z])/
+
+  # How many passwords to keep in archive
+  # config.password_archiving_count = 5
+
+  # Deny old password (true, false, count)
+  # config.deny_old_passwords = true
+
+  # enable email validation for :secure_validatable. (true, false, validation_options)
+  # dependency: need an email validator like rails_email_validator
+  # config.email_validation = true
+
+  # captcha integration for recover form
+  # config.captcha_for_recover = true
+
+  # captcha integration for sign up form
+  # config.captcha_for_sign_up = true
+
+  # captcha integration for sign in form
+  # config.captcha_for_sign_in = true
+
+  # captcha integration for unlock form
+  # config.captcha_for_unlock = true
+
+  # captcha integration for confirmation form
+  # config.captcha_for_confirmation = true
+
+  # Time period for account expiry from last_activity_at
+  config.expire_after = 5.months
+
 end
