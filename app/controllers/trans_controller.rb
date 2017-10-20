@@ -91,33 +91,17 @@ class TransController < ApplicationController
     end
   end
 
-  def transfer_money
-    # This query is used to find the account balance
-    last_transaction = Tran.where(account_id: @account.id).last(2).first.as_json
-
-    if @tran[:amount] >= 100000
-      @tran[:status] = "pending"
-      @tran[:balance] = last_transaction['balance'] - @tran[:amount]
-    else
-      # Getting the data that was entered in form
-      reciving_account_number = @tran[:transfer_account].to_s
-      rec_acc = Account.where(accnumber: reciving_account_number)
-      # Entering the record in other persons account
-      Tran.create(:amount => @tran[:amount].to_s,
-                  :credit => 'credit',
-                  :user_id => rec_acc.as_json[0]['user_id'],
-                  :account_id => rec_acc.as_json[0]['id'],
-                  :created_at => DateTime,
-                  :updated_at => DateTime,
-                  :transfer_account => @tran[:account_id])
-      # Deducting the amount from present user balance
-      @tran[:balance] = last_transaction['balance'] - @tran[:amount]
+  def do_transaction_specific_calculations
+    if tran_params[:credit] == 'credit'
+      @tran_mod = check_credit_conditions()
+    elsif tran_params[:credit] == 'debit'
+      @tran_mod = check_debit_conditions()
+    elsif tran_params[:credit] == 'transfer'
+      @tran_mod = transfer_money
+    elsif tran_params[:credit] == 'request'
+      @tran_mod = request_money
     end
-
-    @tran
-
-    # TODO: if account number is not found
-    # TODO: Same functionality for email and phone number search
+    @tran_mod
   end
 
   def check_credit_conditions
@@ -134,6 +118,35 @@ class TransController < ApplicationController
     @tran
   end
 
+  def transfer_money
+    if @tran[:amount] >= 100000
+      current_acc = Account.find_by(id: @tran[:account_id])
+      current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
+      @tran[:status] = "pending"
+      @tran[:balance] = current_tran_last_balance[:balance] - @tran[:amount]
+    else
+      rec_acc = find_account
+      rec_acc_last_transaction = rec_acc.trans.where.not(balance: nil).last
+      # Entering the record in other persons account
+      Tran.create(:amount => @tran[:amount].to_s,
+                  :credit => 'credit',
+                  :balance => rec_acc_last_transaction[:balance] + @tran[:amount],
+                  :user_id => rec_acc[:user_id],
+                  :account_id => rec_acc[:id],
+                  :created_at => DateTime,
+                  :updated_at => DateTime,
+                  :transfer_account => @tran[:account_id])
+      # Deducting the amount from present user balance
+      current_acc = Account.find_by(id: @tran[:account_id])
+      current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
+      @tran[:balance] = current_tran_last_balance[:balance] - @tran[:amount]
+    end
+    @tran
+
+    # TODO: if account number is not found
+    # TODO: Same functionality for email and phone number search
+  end
+
   def request_money
     @tran[:status] = "pending"
     @tran
@@ -142,33 +155,16 @@ class TransController < ApplicationController
   def change_status(updated_info)
     if @tran[:credit] == 'request'
       do_request_transaction_calculations
-    end
-    if updated_info[:status] == 'approve'
-      account_to_transfer = Tran.find_by(id: params[:id])[:transfer_account]
-    elsif updated_info[:status] == 'decline'
-      account_to_transfer = Tran.find_by(id: params[:id])[:account_id]
-    end
-    if updated_info[:status] != 'pending'
-      rec_acc = Account.where(accnumber: account_to_transfer)
-      last_transaction = Tran.where.not(balance: nil).last
-      # last_transaction = Tran.where(account_id: rec_acc[0][:id]).last(2).first
-      Tran.create(:amount => @tran[:amount].to_s,
-                  :credit => 'transfer',
-                  :balance => last_transaction[:balance] + @tran[:amount],
-                  :user_id => rec_acc[0]['user_id'],
-                  :account_id => rec_acc[0]['id'],
-                  :created_at => DateTime,
-                  :updated_at => DateTime,
-                  :transfer_account => @tran[:account_id])
+    else
+      do_transfer_transaction_calculations
     end
   end
 
   def do_request_transaction_calculations
     if tran_params[:status] == 'approve'
-      account_to_transfer = @tran[:transfer_account]
-      rec_acc = Account.find_by(accnumber: account_to_transfer)
+      rec_acc = find_account
+      # rec_acc = Account.find_by(accnumber: account_to_transfer)
       rec_acc_last_transaction = rec_acc.trans.where.not(balance: nil).last
-
       Tran.create(:amount => @tran[:amount].to_s,
                   :credit => 'request',
                   :balance => rec_acc_last_transaction[:balance] - @tran[:amount],
@@ -179,25 +175,62 @@ class TransController < ApplicationController
                   :transfer_account => @tran[:account_id])
       current_acc = Account.find_by(id: @tran[:account_id])
       current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
-      @tran.update_attributes(:balance => current_tran_last_balance[:balance] + @tran[:amount])
+      Tran.create(:amount => @tran[:amount].to_s,
+                  :credit => 'request',
+                  :balance => current_tran_last_balance[:balance] + @tran[:amount],
+                  :user_id => current_acc[:user_id],
+                  :account_id => current_acc[:id],
+                  :created_at => DateTime,
+                  :updated_at => DateTime,
+                  :transfer_account => @tran[:account_id])
+      puts "Yash"
     elsif tran_params[:status] == 'decline'
-      @tran.update_attributes(:credit =>  + 'Your request for money has been declined')
+      current_acc = Account.find_by(id: @tran[:account_id])
+      current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
+      @tran.update_attributes(:balance => current_tran_last_balance[:balance])
+      @tran.update_attributes(:credit => 'request')
     end
-
-
   end
 
-  def do_transaction_specific_calculations
-    if tran_params[:credit] == 'credit'
-      @tran_mod = check_credit_conditions()
-    elsif tran_params[:credit] == 'debit'
-      @tran_mod = check_debit_conditions()
-    elsif tran_params[:credit] == 'transfer'
-      @tran_mod = transfer_money()
-    elsif tran_params[:credit] == 'request'
-      @tran_mod = request_money()
+
+  def do_transfer_transaction_calculations
+    if tran_params[:status] == 'approve'
+      account_to_transfer = find_account
+      rec_acc = Account.find_by_accnumber(account_to_transfer)
+      rec_acc_last_transaction = rec_acc.trans.where.not(balance: nil).last
+      Tran.create(:amount => @tran[:amount].to_s,
+                  :credit => 'credit',
+                  :balance => rec_acc_last_transaction[:balance] + @tran[:amount],
+                  :user_id => rec_acc[:user_id],
+                  :account_id => rec_acc[:id],
+                  :created_at => DateTime,
+                  :updated_at => DateTime,
+                  :transfer_account => @tran[:account_id])
+    elsif tran_params[:status] == 'decline'
+      current_acc = Account.find_by(id: @tran[:account_id])
+      current_acc_last_transaction = current_acc.trans.where.not(balance: nil).last
+      Tran.create(:amount => @tran[:amount].to_s,
+                  :credit => 'credit',
+                  :balance => current_acc_last_transaction[:balance] + @tran[:amount],
+                  :user_id => current_acc[:user_id],
+                  :account_id => current_acc[:id],
+                  :created_at => DateTime,
+                  :updated_at => DateTime,
+                  :transfer_account => @tran[:account_id])
     end
-    @tran_mod
+  end
+
+  def find_account
+    if @tran[:transfer_account].include? '@'
+      account_user = User.find_by_email(@tran[:transfer_account])
+      account_to_transfer = account_user.accounts.find_by(acctype: 'checking')
+    elsif @tran[:transfer_account].length == 10
+      account_user = User.find_by_phone(@tran[:transfer_account])
+      account_to_transfer = account_user.accounts.find_by(acctype: 'checking')
+    elsif @tran[:transfer_account].length == 12
+      account_to_transfer =  Account.find_by_accnumber(@tran[:transfer_account])
+    end
+    account_to_transfer
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

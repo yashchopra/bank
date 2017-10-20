@@ -27,7 +27,8 @@ class Tran < ApplicationRecord
   end
 
   def deductible_amount
-    last_transaction = Tran.where(account_id.to_s).last.as_json
+    current_acc = Account.find_by_id(account_id)
+    last_transaction = current_acc.trans.where.not(balance: nil).last
     if last_transaction['id'] != id and amount > last_transaction['balance']
       errors.add(:amount, "Amount can't be greater than your balance. Your current balance is #{last_transaction['balance']}")
     end
