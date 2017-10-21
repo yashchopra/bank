@@ -2,6 +2,7 @@ class UsersController < ApplicationController
   before_action :authenticate_user!
   after_action :verify_authorized, except: :home
 
+
   def home
     if current_user.role == 'admin' or current_user.role == 'tier2' or current_user.role == 'tier1'
       redirect_to users_url and return
