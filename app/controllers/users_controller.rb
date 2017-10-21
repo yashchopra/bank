@@ -36,8 +36,8 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     authorize current_user
 
-    respond_to do |format|
-      if @user.save
+      respond_to do |format|
+      if verify_recaptcha(model: @user) &&  @user.save
         format.html {redirect_to users_url, notice: 'Tran was successfully created.'}
         format.json {render :show, status: :created, location: @tran_mod}
       else
@@ -51,7 +51,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     authorize @user
 
-    if @user.update_attributes(user_params)
+    if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
       redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'
       # format.json { render :show, status: :ok, location: @user }
     else
