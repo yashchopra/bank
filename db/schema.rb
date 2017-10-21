@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171021005129) do
+ActiveRecord::Schema.define(version: 20171016015240) do
 
   create_table "accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "acctype"
@@ -50,6 +50,13 @@ ActiveRecord::Schema.define(version: 20171021005129) do
     t.integer "failed_attempts", default: 0, null: false
     t.string "unlock_token"
     t.datetime "locked_at"
+    t.integer "second_factor_attempts_count", default: 0
+    t.string "encrypted_otp_secret_key"
+    t.string "encrypted_otp_secret_key_iv"
+    t.string "encrypted_otp_secret_key_salt"
+    t.string "direct_otp"
+    t.datetime "direct_otp_sent_at"
+    t.timestamp "totp_timestamp"
     t.string "phone"
     t.string "first_name"
     t.string "last_name"
@@ -73,5 +80,4 @@ ActiveRecord::Schema.define(version: 20171021005129) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
     t.index ["unlock_token"], name: "index_users_on_unlock_token", unique: true
   end
-
 end

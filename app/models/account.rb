@@ -9,9 +9,14 @@ class Account < ApplicationRecord
   private
 
   def set_account_number
-    acc_number = get_unique_acc_number
-    self.accnumber = acc_number
-    self.accrouting = '100011000'
+    if acctype == "Credit Card"
+      self.accnumber = get_unique_credit_card_number
+      self.accrouting = get_unique_cvv_number
+    else
+      acc_number = get_unique_acc_number
+      self.accnumber = acc_number
+      self.accrouting = '100011000'
+    end
   end
 
   def get_unique_acc_number
@@ -21,6 +26,24 @@ class Account < ApplicationRecord
       not_unique = Account.exists?(accnumber: acc_num)
     end
     acc_num
+  end
+
+  def get_unique_credit_card_number
+    not_unique = true
+    while not_unique
+      credit_card_number = rand.to_s[-16..-1]
+      not_unique = Account.exists?(accnumber: credit_card_number)
+    end
+    credit_card_number
+  end
+
+  def get_unique_cvv_number
+    not_unique = true
+    while not_unique
+      cvv_number = rand.to_s[-3..-1]
+      not_unique = Account.exists?(accnumber: cvv_number)
+    end
+    cvv_number
   end
 
   def number_of_accounts
