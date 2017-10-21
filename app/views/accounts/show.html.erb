@@ -25,7 +25,7 @@
           </td>
 
           <td>
-            <button class="waves-effect waves-light btn"> <%= link_to 'Back to Accounts', user_accounts_path %> </button>
+            <button class="waves-effect waves-light btn"> <%= link_to 'Back to Accounts', user_accounts_path(@account.user_id) %> </button>
           </td>
           <td>
             <button class="waves-effect waves-light btn"> <%= link_to 'New Transaction', new_account_tran_path(@account) %> </button>

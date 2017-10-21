@@ -1,0 +1,72 @@
+<div class="container">
+  <div class="row">
+    <div class="col m12 offset-m0">
+      <h5 class="black-text">Sign up</h5>
+      <%= form_for(@user) do |f| %>
+
+          <div class="row">
+            <div class="input-field col s12">
+              <%= f.label :email %><br/>
+              <%= f.email_field :email, autofocus: true %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="input-field col s6">
+              <%= f.label :first_name %><br/>
+              <%= f.text_field :first_name, autofocus: true %>
+            </div>
+
+            <div class="input-field col s6">
+              <%= f.label :last_name %><br/>
+              <%= f.text_field :last_name, autofocus: true %>
+            </div>
+          </div>
+
+
+          <div class="row">
+            <div class="input-field col s6">
+              <%= f.label :phone %><br/>
+              <%= f.text_field :phone, autofocus: true %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="input-field col s12">
+              <%= f.label :street %><br/>
+              <%= f.text_field :street, autofocus: true %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="input-field col s6">
+              <%= f.label :city %><br/>
+              <%= f.text_field :city, autofocus: true %>
+            </div>
+
+            <div class="input-field col s6">
+              <%= f.label :state %><br/>
+              <%= f.text_field :state, autofocus: true %>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="input-field col s6">
+              <%= f.label :country %><br/>
+              <%= f.text_field :country, autofocus: true %>
+            </div>
+
+            <div class="input-field col s6">
+              <%= f.label :zip %><br/>
+              <%= f.text_field :zip, autofocus: true %>
+            </div>
+          </div>
+
+          <div class="btn waves-effect waves-light" type="submit" name="action">
+            <%= f.submit 'Update info' %>
+          </div>
+      <% end %>
+
+    </div>
+  </div>
+</div>
