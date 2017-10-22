@@ -23,7 +23,11 @@ class User < ApplicationRecord
 	end
 
 
+<<<<<<< HEAD
   devise :database_authenticatable, :recoverable, :trackable, :validatable, :two_factor_authenticatable, :lockable, :timeoutable
+=======
+  devise :database_authenticatable, :registerable,:session_limitable, :recoverable, :trackable, :validatable, :two_factor_authenticatable, :lockable, :timeoutable
+>>>>>>> 2d2e016570bbef842eb8b1d6c84c0960b453eb42
 	has_one_time_password(encrypted: true)
 
 	def send_two_factor_authentication_code(code)
