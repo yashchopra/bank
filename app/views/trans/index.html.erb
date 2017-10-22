@@ -10,6 +10,8 @@
     </tr>
 <% end %>
 
+
+
 <div style="width: 100%;overflow:auto;">
 
   <div style="float:left; width: 70%">
@@ -24,6 +26,29 @@
     <% end %>
   </div>
 
+
+  <% @users_to_be_approved.each do |user| %>
+      <tr>
+        <td><%= user.updated_email %></td>
+        <td><%= user.updated_phone %></td>
+      </tr>
+  <% end %>
+
+
+  <div style="width: 100%;overflow:auto;">
+
+    <div style="float:left; width: 70%">
+      <% @users_to_be_approved.each do |user| %>
+          <table>
+            <tbody>
+            <tr>
+              <td><%= render user %></td>
+            </tr>
+            </tbody>
+          </table>
+      <% end %>
+    </div>
+  </div>
 
   <div style="float:right; width: 30%">
     <table class="highlight">

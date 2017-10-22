@@ -31,6 +31,10 @@ gem 'hirb'
 # User session management
 gem "pundit"
 
+# password expirable
+gem 'devise_security_extension', :path => "lib/gems/devise_security_extension-0.9.2"
+gem 'rails_email_validator'
+
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
@@ -44,6 +48,7 @@ gem 'jbuilder', '~> 2.5'
 gem 'bcrypt', platforms: :ruby
 # Use Capistrano for deployment
 # gem 'capistrano-rails', group: :development
+#gem 'coffee-script-source', '1.8.0'
 
 group :development, :test do
   # Call 'byebug' anywhere in the code to stop execution and get a debugger console
@@ -64,3 +69,4 @@ end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
+gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension.git'

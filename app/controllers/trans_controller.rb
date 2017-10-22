@@ -12,6 +12,9 @@ class TransController < ApplicationController
     else
       user_not_authorized and return
     end
+    if current_user.tier1?
+      @users_to_be_approved = User.where(status: 'pending')
+    end
   end
 
   # GET /trans/1
@@ -107,8 +110,11 @@ class TransController < ApplicationController
 
   def check_credit_conditions
     # This query is used to find the account balance
-    last_transaction = Tran.where.not(balance: nil).last
-    @tran[:balance] = last_transaction[:balance] + @tran[:amount]
+    #last_transaction = Tran.where.not(balance: nil).last
+    #@tran[:balance] = last_transaction[:balance] + @tran[:amount]
+    @tran[:isCritical] = @tran[:amount]>100000 ? true : false
+    @tran[:isEligibleForTier1] = @tran[:amount]>100000 ? false : true
+
     @tran
   end
 
