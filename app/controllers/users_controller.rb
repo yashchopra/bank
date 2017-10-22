@@ -17,8 +17,8 @@ class UsersController < ApplicationController
   end
 
   def edit
-    @user = User.find(params[:id])
-    authorize @user
+  	@user = User.find(params[:id])
+  	authorize @user
   end
 
   def destroy
@@ -37,8 +37,8 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     authorize current_user
 
-    respond_to do |format|
-      if @user.save
+      respond_to do |format|
+      if verify_recaptcha(model: @user) &&  @user.save
         format.html {redirect_to users_url, notice: 'Tran was successfully created.'}
         format.json {render :show, status: :created, location: @tran_mod}
       else
@@ -52,6 +52,12 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     authorize @user
 
+    if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
+      redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'
+      # format.json { render :show, status: :ok, location: @user }
+    else
+      redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull'
+      # format.json { render json: @account.errors, status: :unprocessable_entity }
     updated_user_params = user_params
     if user_params['status']
       updated_user_params = check_status_function
@@ -69,7 +75,6 @@ class UsersController < ApplicationController
       end
     end
   end
-
 
   def user_params
     params.require(:user).permit(:role, :email, :password, :password_confirmation, :phone, :first_name, :last_name, :city, :state, :country, :street, :zip, :updated_email, :updated_phone, :status)
