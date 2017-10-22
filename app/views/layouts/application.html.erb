@@ -1,24 +1,46 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Bank</title>
-    <%= csrf_meta_tags %>
+<head>
+  <title>Bank</title>
+  <%= csrf_meta_tags %>
 
-    <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload' %>
-    <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
-  </head>
+  <%= stylesheet_link_tag 'application', media: 'all', 'data-turbolinks-track': 'reload' %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track': 'reload' %>
+</head>
 
-  <body>
+<body>
 
-<div style="text-align: right;">
-  <%= current_user.role if current_user != nil %>
-  Remove_this_code: 
- <%= link_to "Sign Out", destroy_user_session_path, method: :delete %> 
-</div>
 
-  	<p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
+<!--<div style="text-align: right;">-->
+<!--<%= current_user.role if current_user %>-->
+<!--<%= current_user.email if current_user %>-->
 
-    <%= yield %>
-  </body>
+<!--</div>-->
+
+<nav>
+  <div class="nav-wrapper teal lighten-1">
+    <span class="brand-logo">CSE 545 - Bank (Group 9) </span>
+    <ul id="nav-mobile" class="right hide-on-med-and-down valign-wrapper">
+      <% if current_user %>
+          <% if current_user.tier1? %>
+              <li>  <%= link_to "Users", users_url %>
+              <li>  <%= link_to "Financial Requests", account_trans_path(Account) %> </li>
+          <% end %>
+          <li> <%= link_to "Update Profile", edit_users_admin_url(current_user) %> </li>
+          <li><%= link_to "Sign Out", destroy_user_session_path, method: :delete %></li>
+          <li> <%= link_to "New User", new_users_admin_path %> </li>
+      <% end %>
+
+
+
+    </ul>
+  </div>
+</nav>
+
+
+<p class="notice"><%= notice %></p>
+<p class="alert"><%= alert %></p>
+
+<%= yield %>
+</body>
 </html>

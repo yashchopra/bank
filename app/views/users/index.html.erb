@@ -1,11 +1,31 @@
-<h1>I am User index page</h1>
+<script>
+    $(document).ready(function() {
+        $('select').material_select();
+    });
 
-<% @users.each do |user| %>
-	<table>
-	<tbody>
-	<tr>
-        <td><%= render user %></td>
-     </tr>
-     </tbody>
-     </table>
-<% end %>
+    $(document).ready(function(){
+        $('.collapsible').collapsible();
+    });
+</script>
+
+
+<div class="container">
+  <div class="row">
+    <div class="col m12 offset-m0">
+      <h5 class="black-text">All users Profile</h5>
+
+        <% @users.each do |user| %>
+            <ul class="collapsible" data-collapsible="accordion">
+              <li>
+                <div class="collapsible-header">
+                  <%= user.first_name %>
+                  <%= user.last_name %>
+                </div>
+                <div class="collapsible-body"><span> <%= render user %> </span></div>
+              </li>
+            </ul>
+        <% end %>
+    </div>
+  </div>
+</div>
+

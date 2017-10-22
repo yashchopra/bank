@@ -12,7 +12,7 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
   # with default "from" parameter.
-  config.mailer_sender = 'please-change-me-at-config-initializers-devise@example.com'
+  config.mailer_sender = 'xyz@gmail.com'
 
   # Configure the class responsible to send e-mails.
   # config.mailer = 'Devise::Mailer'
@@ -173,10 +173,10 @@ Devise.setup do |config|
   # Defines which strategy will be used to lock an account.
   # :failed_attempts = Locks an account after a number of failed attempts to sign in.
   # :none            = No lock strategy. You should handle locking by yourself.
-  # config.lock_strategy = :failed_attempts
+   config.lock_strategy = :failed_attempts
 
   # Defines which key will be used when locking and unlocking an account
-  # config.unlock_keys = [:email]
+   config.unlock_keys = [:email]
 
   # Defines which strategy will be used to unlock an account.
   # :email = Sends an unlock link to the user email
@@ -187,13 +187,15 @@ Devise.setup do |config|
 
   # Number of authentication tries before locking an account if lock_strategy
   # is failed attempts.
-  # config.maximum_attempts = 20
+  config.maximum_attempts = 2
+
+  config.timeout_in = 1200.seconds
 
   # Time interval to unlock the account if :time is enabled as unlock_strategy.
   # config.unlock_in = 1.hour
 
   # Warn on the last attempt before the account is locked.
-  # config.last_attempt_warning = true
+   config.last_attempt_warning = true
 
   # ==> Configuration for :recoverable
   #
@@ -274,4 +276,50 @@ Devise.setup do |config|
   # When using OmniAuth, Devise cannot automatically set OmniAuth path,
   # so you need to do it manually. For the users scope, it would be:
   # config.omniauth_path_prefix = '/my_engine/users/auth'
+  config.max_login_attempts = 13  # Maximum second factor attempts count.
+  config.allowed_otp_drift_seconds = 30  # Allowed TOTP time drift between client and server.
+  config.otp_length = 6  # TOTP code length
+  config.direct_otp_valid_for = 1.minutes  # Time before direct OTP becomes invalid
+  config.direct_otp_length = 6  # Direct OTP code length
+  config.remember_otp_session_for_seconds = 0.days  # Time before browser has to perform 2fA again. Default is 0.
+  config.otp_secret_encryption_key = ENV['OTP_SECRET_ENCRYPTION_KEY']
+  config.second_factor_resource_id = 'id' # Field or method name used to set value for 2fA remember cookie
+
+  # ==> Security Extension
+  # Configure security extension for devise
+
+  # Should the password expire (e.g 3.months)
+  config.expire_password_after = 3.months
+
+  # Need 1 char of A-Z, a-z and 0-9
+  config.password_regex = /(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,20}/
+
+  # How many passwords to keep in archive
+  # config.password_archiving_count = 5
+
+  # Deny old password (true, false, count)
+  # config.deny_old_passwords = true
+
+  # enable email validation for :secure_validatable. (true, false, validation_options)
+  # dependency: need an email validator like rails_email_validator
+  config.email_validation = true
+
+  # captcha integration for recover form
+  # config.captcha_for_recover = true
+
+  # captcha integration for sign up form
+  # config.captcha_for_sign_up = true
+
+  # captcha integration for sign in form
+  # config.captcha_for_sign_in = true
+
+  # captcha integration for unlock form
+  # config.captcha_for_unlock = true
+
+  # captcha integration for confirmation form
+  # config.captcha_for_confirmation = true
+
+  # Time period for account expiry from last_activity_at
+  config.expire_after = 90.days
+
 end

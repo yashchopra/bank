@@ -6,23 +6,32 @@ class UserPolicy
 		@user = model
 	end
 
-	def index?
-		@current_user.admin? || @current_user.tier1? || @current_user.toer2?
+	def destroy?
+		return false if @current_user == @user
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 
-	# def home?
-	# 	@current_user == @user
-	# end
+	def new?
+		@current_user.admin? || @current_user.tier1?
+	end
+
+	def index?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
+	end
 
 	def show?
-		@current_user.admin? || @current_user.tier1? || @current_user.toer2?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 
 	def edit?
-		@current_user.admin? || @current_user.tier1? || @current_user.toer2?
+		@current_user == @user
 	end
 
 	def update?
-		@current_user.admin? || @current_user.tier1? || @current_user.toer2?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2? || @current_user == @user
+	end
+
+	def create?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 end

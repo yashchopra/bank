@@ -13,11 +13,21 @@ class AccountsController < ApplicationController
   # GET /accounts/1
   # GET /accounts/1.json
   def show
+    @trans = @account.trans.all
   end
 
   # GET /accounts/new
   def new
     @account = @user.accounts.new
+    if @user.organization?
+      @account_types = ['Checking']
+    else
+      @account_types = ['Checking','Savings','Credit Card']
+    end
+
+    @user.accounts.all.pluck(:acctype).each do |type|
+      @account_types.delete(type)
+      end
   end
 
   # GET /accounts/1/edit
@@ -32,13 +42,14 @@ class AccountsController < ApplicationController
 
     respond_to do |format|
       if @account.save
-        format.html { redirect_to user_account_path(@user, @account), notice: 'Account was successfully created.' }
+        format.html { redirect_to user_account_path(current_user, @account), notice: 'Account was successfully created.' }
         format.json { render :show, status: :created, location: @account }
       else
         format.html { render :new }
         format.json { render json: @account.errors, status: :unprocessable_entity }
       end
     end
+    add_initial_ammount(account_params)
   end
 
   # PATCH/PUT /accounts/1
@@ -77,10 +88,21 @@ class AccountsController < ApplicationController
       elsif current_user.customer? or current_user.organization?
         @user = current_user
       elsif current_user.tier1?
-        @user = current_user
+        @user = User.find(params[:user_id])
         # @user = @account.user_id
       end
     end
+
+  def add_initial_ammount(account_params)
+    Tran.create(:amount => 2000,
+                :credit => 'credit',
+                :balance => 2000,
+                :user_id => @user.id,
+                :account_id => @account.id,
+                :created_at => DateTime,
+                :updated_at => DateTime,
+                :transfer_account => 'Initial Amount')
+  end
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def account_params

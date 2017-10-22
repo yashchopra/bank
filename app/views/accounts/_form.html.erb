@@ -11,27 +11,13 @@
     </div>
   <% end %>
 
-  <div class="field">
-    <%= form.label :acctype %>
-    <%= form.text_field :acctype, id: :account_acctype %>
-  </div>
+    <div class="field">
+      <%= form.label :acctype %>
+      <% @account_types = [account[:acctype]] if account[:acctype] %>
+      <%= form.select(:acctype, @account_types, {:include_blank => 'Select an Account Type'},:required => true) %>
+    </div>
 
-  <div class="field">
-    <%= form.label :accnumber %>
-    <%= form.text_field :accnumber, id: :account_accnumber %>
-  </div>
-
-  <div class="field">
-    <%= form.label :accrouting %>
-    <%= form.text_field :accrouting, id: :account_accrouting %>
-  </div>
-
-  <div class="field">
-    <%= form.label :user_id %>
-    <%= form.number_field :user_id, id: :account_user_id %>
-  </div>
-
-  <div class="actions">
+  <div class="btn waves-effect waves-light" type="submit" name="action">
     <%= form.submit %>
   </div>
 <% end %>
