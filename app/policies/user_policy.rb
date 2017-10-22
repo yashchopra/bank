@@ -27,6 +27,10 @@ class UserPolicy
 		@current_user == @user
 	end
 
+	def log?
+    @current_user.admin?
+	end
+
 	def update?
 		@current_user.admin? || @current_user.tier1? || @current_user.tier2? || @current_user == @user
 	end

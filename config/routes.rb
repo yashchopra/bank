@@ -5,6 +5,8 @@ Rails.application.routes.draw do
   	resources :accounts 
   end
 
+  get 'users/:id/logs/:lines' => "users#log", as: "log"
+
   resources :accounts do
       resources :trans
   end
