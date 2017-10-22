@@ -31,6 +31,10 @@ gem 'hirb'
 # User session management
 gem "pundit"
 
+# password expirable
+gem 'devise_security_extension', :path => "lib/gems/devise_security_extension-0.9.2"
+gem 'rails_email_validator'
+
 # Use CoffeeScript for .coffee assets and views
 gem 'coffee-rails', '~> 4.2'
 # Turbolinks makes navigating your web application faster. Read more: https://github.com/turbolinks/turbolinks
