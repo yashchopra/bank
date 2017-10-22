@@ -52,19 +52,21 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     authorize @user
 
-    if @user.update_attributes(user_params)
-      if user_params[:status].present?
-        user_params = check_status_function
-        redirect_to user_accounts_path(@current_user), notice: 'Changes acknoledged'
-      elsif user_params[:updated_email].nil? || user_params[:updated_phone] != nil
-        user_params[:status] = 'pending'
-        redirect_to user_accounts_path(@current_user), notice: 'Your information is sent for approval'
+    updated_user_params = user_params
+    if user_params['status']
+      updated_user_params = check_status_function
+      puts "yash"
+    elsif user_params['updated_email'] or user_params['updated_phone']
+      @user.update_attributes(:status => 'pending')
+    end
+
+    respond_to do |format|
+      if @user.update(updated_user_params)
+        format.html {redirect_to user_accounts_path(@current_user), notice: 'Changes acknoledged'}
       else
-        redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'
+        format.html {render :edit}
+        format.json {render json: @user.errors, status: :unprocessable_entity}
       end
-    else
-      redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull'
-      # format.json { render json: @account.errors, status: :unprocessable_entity }
     end
   end
 
@@ -85,17 +87,19 @@ class UsersController < ApplicationController
 
 
   def check_status_function
-    if user_params[:status] == 'approve'
-      if user_params[:updated_email] != nil
-        user_params[:email] = user_params[:updated_email]
-
+    if user_params['status'] == 'approve'
+      if @user[:updated_email]
+        @user.update_attributes(:email => @user[:updated_email], :updated_email => nil)
+        # @user[:updated_email] = nil
       end
-      if user_params[:updated_phone] != nill
-        user_params[:phone] = user_params[:updated_phone]
+      if @user[:updated_phone]
+        @user.update_attributes(:phone => @user[:updated_phone], :updated_phone => nil)
+        # @user[:phone] = @user[:updated_phone]
       end
-    elsif user_params[:status] == 'declined'
-      user_params[:updated_phone] = user_params[:updated_email] = nil
-      user_params[:status] = nil
+    elsif user_params['status'] == 'declined'
+      @user.update_attributes(:updated_email=> nil, :updated_phone => nil)
+      # @user[:updated_phone] = @user[:updated_email] = nil
+      user_params['status'] = nil
     end
     user_params
   end
