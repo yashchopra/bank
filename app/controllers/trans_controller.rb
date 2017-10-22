@@ -12,6 +12,9 @@ class TransController < ApplicationController
     else
       user_not_authorized and return
     end
+    if current_user.tier1?
+      @users_to_be_approved = User.where(status: 'pending')
+    end
   end
 
   # GET /trans/1
