@@ -249,6 +249,5 @@ class TransController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def tran_params
     params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status)
-
   end
 end
