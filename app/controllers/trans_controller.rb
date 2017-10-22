@@ -190,7 +190,6 @@ class TransController < ApplicationController
                   :created_at => DateTime,
                   :updated_at => DateTime,
                   :transfer_account => @tran[:account_id])
-      puts "Yash"
     elsif tran_params[:status] == 'decline'
       current_acc = Account.find_by(id: @tran[:account_id])
       current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
