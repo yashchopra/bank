@@ -21,12 +21,15 @@ class AccountsController < ApplicationController
     @account = @user.accounts.new
     if @user.organization?
       @account_types = ['Checking']
+      @acc_counter = 1
     else
       @account_types = ['Checking','Savings','Credit Card']
+      @acc_counter = 3
     end
 
     @user.accounts.all.pluck(:acctype).each do |type|
       @account_types.delete(type)
+      @acc_counter = @acc_counter - 1
       end
   end
 

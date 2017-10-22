@@ -1,6 +1,15 @@
 <script>
     $(document).ready(function() {
         $('select').material_select();
+        $('.transType select').change(function (){
+            if(this.value == "credit" || this.value =="debit"){
+                if(!$('.accNum').hasClass('hidden'))
+                    $('.accNum').addClass('hidden');
+            }else{
+                if($('.accNum').hasClass('hidden'))
+                  $('.accNum').removeClass('hidden');
+            }
+        })
     });
 </script>
 

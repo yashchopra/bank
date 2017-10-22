@@ -33,8 +33,9 @@
 
       <br>
 
-      <button class="waves-effect waves-light btn"> <%= link_to 'New Account', new_user_account_path(@user) %> </button>
+      <button class="waves-effect waves-light btn" disabled="<%= @acc_counter=0 ? 'disabled' : '' %>"> <%= link_to 'Create New Account', new_user_account_path(@user) %> </button>
 
     </div>
   </div>
 </div>
+

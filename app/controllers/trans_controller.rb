@@ -12,6 +12,9 @@ class TransController < ApplicationController
     else
       user_not_authorized and return
     end
+    if current_user.tier1?
+      @users_to_be_approved = User.where(status: 'pending')
+    end
   end
 
   # GET /trans/1
@@ -23,6 +26,7 @@ class TransController < ApplicationController
   def new
     # @tran = Tran.new
     @tran = @account.trans.new
+    trans_type_checker
   end
 
   ``
@@ -92,9 +96,9 @@ class TransController < ApplicationController
   end
 
   def do_transaction_specific_calculations
-    if tran_params[:credit] == 'credit'
+    if tran_params[:credit] == 'credit' or tran_params[:credit] == 'pay'
       @tran_mod = check_credit_conditions()
-    elsif tran_params[:credit] == 'debit'
+    elsif tran_params[:credit] == 'debit' or tran_params[:credit] == 'spend'
       @tran_mod = check_debit_conditions()
     elsif tran_params[:credit] == 'transfer'
       @tran_mod = transfer_money
@@ -106,8 +110,11 @@ class TransController < ApplicationController
 
   def check_credit_conditions
     # This query is used to find the account balance
-    last_transaction = Tran.where.not(balance: nil).last
-    @tran[:balance] = last_transaction[:balance] + @tran[:amount]
+    #last_transaction = Tran.where.not(balance: nil).last
+    #@tran[:balance] = last_transaction[:balance] + @tran[:amount]
+    @tran[:isCritical] = @tran[:amount]>100000 ? true : false
+    @tran[:isEligibleForTier1] = @tran[:amount]>100000 ? false : true
+
     @tran
   end
 
@@ -183,7 +190,6 @@ class TransController < ApplicationController
                   :created_at => DateTime,
                   :updated_at => DateTime,
                   :transfer_account => @tran[:account_id])
-      puts "Yash"
     elsif tran_params[:status] == 'decline'
       current_acc = Account.find_by(id: @tran[:account_id])
       current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
@@ -218,6 +224,18 @@ class TransController < ApplicationController
                   :updated_at => DateTime,
                   :transfer_account => @tran[:account_id])
     end
+  end
+
+  def trans_type_checker
+    at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
+    if at_checker == "Credit Card"
+      @trans_types = ['pay', 'spend']
+   elsif at_checker == "Checking" or at_checker == "Savings"
+      @trans_types = ['credit', 'debit', 'transfer', 'request']
+    else 
+      @trans_types = ['Not enough Balance']
+    end
+
   end
 
   def find_account
