@@ -17,8 +17,9 @@
     </div>
 
     <div class="field">
-      <%= form.label :credit %>
-      <%= form.select(:credit, Tran.credits.keys.map {|credit| [credit.titleize, credit]}, id: :tran_credit) %>
+      <%= form.label 'Transaction Type' %>
+      <%= form.select(:credit, @trans_types, {:include_blank => 'Select a Transaction Type'},:required => true) %>
+
     </div>
 
     <div class="field">

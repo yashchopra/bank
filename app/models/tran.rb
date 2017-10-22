@@ -1,6 +1,6 @@
 class Tran < ApplicationRecord
   belongs_to :account
-  enum credit: [:credit, :debit, :transfer, :request]
+  enum credit: [:credit, :debit, :transfer, :request, :pay, :spend]
   enum status: [:pending, :approve, :decline]
 
   validates_presence_of :amount
