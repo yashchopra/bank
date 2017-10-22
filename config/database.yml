@@ -31,4 +31,4 @@ development:
  database: db/development/mysql
  pool: 5
  username: root
- password: root
+ password: test123
