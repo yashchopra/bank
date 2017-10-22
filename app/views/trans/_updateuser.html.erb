@@ -1,5 +1,5 @@
 
-<%= form_for(user) do |f| %>
+<%= form_for(updateuser) do |f| %>
     <%= f.select(:status, User.statuses.keys.map {|status| [status.titleize, status]})%>
     <button> <%= f.submit 'Update info'%> </button>
 <% end %>

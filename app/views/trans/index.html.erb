@@ -4,21 +4,15 @@
     });
 </script>
 
-<% @trans.each do |tran| %>
-    <tr>
-      <td><%= tran.amount %></td>
-    </tr>
-<% end %>
-
-
-
 <div style="width: 100%;overflow:auto;">
 
-  <div style="float:left; width: 70%">
+  <div style="float:left; width: 40%">
+    <h5>Update Transactions</h5>
     <% @trans.each do |tran| %>
         <table>
           <tbody>
           <tr>
+            <td><%= tran.amount %></td>
             <td><%= render tran, account: Account.find_by(id: tran.account_id) %></td>
           </tr>
           </tbody>
@@ -26,31 +20,18 @@
     <% end %>
   </div>
 
-
-  <% @users_to_be_approved.each do |user| %>
-      <tr>
-        <td><%= user.updated_email %></td>
-        <td><%= user.updated_phone %></td>
-      </tr>
-  <% end %>
-
-
-  <div style="width: 100%;overflow:auto;">
-
-    <div style="float:left; width: 70%">
-      <% @users_to_be_approved.each do |user| %>
-          <table>
-            <tbody>
-            <tr>
-              <td><%= render user %></td>
-            </tr>
-            </tbody>
-          </table>
-      <% end %>
-    </div>
+  <div style="width: 40%;overflow:auto;">
+    <h5>Update Users</h5>
+    <% @users_to_be_approved.each do |updateuser| %>
+        <tr>
+          <td><%= updateuser.updated_email %></td>
+          <td><%= updateuser.updated_phone %></td>
+          <td><%= render 'updateuser', updateuser: updateuser %></td>
+        </tr>
+    <% end %>
   </div>
 
-  <div style="float:right; width: 30%">
+  <div style="float:right; width: 20%">
     <table class="highlight">
       <thead>
       <tr>
@@ -68,5 +49,5 @@
       </tbody>
     </table>
   </div>
-
 </div>
+
