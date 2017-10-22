@@ -227,7 +227,7 @@ class TransController < ApplicationController
       @trans_types = ['pay', 'spend']
    elsif at_checker == "Checking" or at_checker == "Savings"
       @trans_types = ['credit', 'debit', 'transfer', 'request']
-    else
+    else 
       @trans_types = ['Not enough Balance']
     end
 
