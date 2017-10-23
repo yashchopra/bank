@@ -8,6 +8,7 @@ class User < ApplicationRecord
 	enum status: [:pending, :approve, :decline]
 	after_initialize :set_default_role, :if => :new_record?
 
+  encrypt :ssn, searchable: true, hash_salt: ENV["SECRET_KEY_BASE"], key: ENV["SECRET_KEY_BASE"]
 	# validates_presence_of :first_name
 	# validates_presence_of :last_name
 	# validates_presence_of :city
@@ -30,6 +31,12 @@ class User < ApplicationRecord
 		# Send code via SMS, etc.
 		@code = code
 		UserMailer.signup_confirmation(email, @code).deliver
-	end
+  end
+
+  private
+
+  def get_random_key
+    return SecureRandom.base64(256)
+  end
 
 end
