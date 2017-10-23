@@ -6,29 +6,44 @@
 
 <div style="width: 100%;overflow:auto;">
 
-  <div style="float:left; width: 40%">
+  <div style="float:left; width: 35%">
+
     <h5>Update Transactions</h5>
     <% @trans.each do |tran| %>
-        <table>
-          <tbody>
-          <tr>
-            <td><%= tran.account %></td>                      
-            <td><%= tran.amount %></td>
-            <td><%= render tran, account: Account.find_by(id: tran.account_id) %></td>
-          </tr>
-          </tbody>
-        </table>
+        <ul class="collapsible" data-collapsible="accordion">
+          <li>
+            <div class="collapsible-header">
+              <span>Account number: <%= Account.find_by_id(tran.account_id)[:accnumber] %> </span>
+              <span style="margin-left: 30px;">Amount: <%= tran.amount %> </span>
+            </div>
+            <div class="collapsible-body">
+              <span> <%= render tran, account: Account.find_by(id: tran.account_id) %> </span>
+            </div>
+          </li>
+        </ul>
     <% end %>
   </div>
 
-  <div style="width: 40%;overflow:auto;">
+  <div style="width: 35%; float:left; margin-left:4.25%;">
+
     <h5>Update Users</h5>
-    <% @users_to_be_approved.each do |updateuser| %>
-        <tr>
-          <td><%= updateuser.updated_email %></td>
-          <td><%= updateuser.updated_phone %></td>
-          <td><%= render 'updateuser', updateuser: updateuser %></td>
-        </tr>
+    <% @user.each do |updateuser| %>
+        <ul class="collapsible" data-collapsible="accordion">
+          <li>
+            <div class="collapsible-header">
+              <span>User Name:
+                <%= updateuser.first_name %>
+                <%= updateuser.last_name %>
+              </span>
+
+            </div>
+            <div class="collapsible-body">
+              <span>Update email: <%= updateuser.updated_email %> </span>
+              <span style="float:right;">Update phone:<%= updateuser.updated_phone %></span>
+              <span> <%= render 'updateuser', updateuser: updateuser %> </span>
+            </div>
+          </li>
+        </ul>
     <% end %>
   </div>
 

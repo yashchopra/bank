@@ -18,8 +18,8 @@
             <ul class="collapsible" data-collapsible="accordion">
               <li>
                 <div class="collapsible-header">
-                  <%= user.first_name %>
-                  <%= user.last_name %>
+                  <span> <%= user.first_name %> <%= user.last_name %></span>
+                  <span style="margin-left: 25%;"> <%= user.email %> </span>
                 </div>
                 <div class="collapsible-body"><span> <%= render user %> </span></div>
               </li>
