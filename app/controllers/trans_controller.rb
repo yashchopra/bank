@@ -83,6 +83,29 @@ class TransController < ApplicationController
     @tran = Tran.find(params[:id])
   end
 
+  def temp
+    puts "HelloHello"
+  end
+  def creditcard_interest
+    last_transaction = Tran.where.not(balance: nil).last
+    @tran[:balance] = last_transaction[:balance] - @tran[:amount]
+    cc_accounts = Account.where(acctype: 'Credit Card')
+    cc_accounts.each do |account|
+
+      total_balance = account.trans.last[:balance]
+      fee_amount = total_balance.t0_int * 0.2
+      Tran.create(:amount => fee_amount,
+                  :credit => 'fee',
+                  :balance => total_balance + fee_amount,
+                  :user_id => current_acc[:user_id],
+                  :account_id => current_acc[:id],
+                  :created_at => DateTime,
+                  :updated_at => DateTime,
+                  :transfer_account => @tran[:account_id])
+    end
+  end
+
+
   def set_account
     if current_user.admin? or current_user.tier2?
       redirect_to users_url
@@ -96,9 +119,9 @@ class TransController < ApplicationController
   end
 
   def do_transaction_specific_calculations
-    if tran_params[:credit] == 'credit' or tran_params[:credit] == 'pay'
+    if tran_params[:credit] == 'credit' or tran_params[:credit] == 'spend'
       @tran_mod = check_credit_conditions
-    elsif tran_params[:credit] == 'debit' or tran_params[:credit] == 'spend'
+    elsif tran_params[:credit] == 'debit' or tran_params[:credit] == 'pay'
       @tran_mod = check_debit_conditions
     elsif tran_params[:credit] == 'transfer'
       @tran_mod = transfer_money
@@ -111,6 +134,12 @@ class TransController < ApplicationController
   def check_credit_conditions
     # This query is used to find the account balance
     #last_transaction = Tran.where.not(balance: nil).last
+    #@tran[:balance] = last_transaction[:balance] +  @tran[:amount]
+    at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
+    if at_checker == "Credit Card"
+      last_transaction = Tran.where.not(balance: nil).last
+      @tran[:balance] = last_transaction[:balance] + @tran[:amount]
+    else
     #@tran[:balance] = last_transaction[:balance] + @tran[:amount]
     if current_user.tier1?
       @tran[:externaluserapproval] == 'false_extuser'
@@ -126,13 +155,19 @@ class TransController < ApplicationController
       @tran[:isEligibleForTier1] = "true_tier_1"
       @tran[:status] = "pending"
     end
+    end
     @tran
-  end
 
+  end
   def check_debit_conditions
     # This query is used to find the account balance
     # last_transaction = Tran.where.not(balance: nil).last
     # @tran[:balance] = last_transaction[:balance] - @tran[:amount]
+    at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
+    if at_checker == "Credit Card"
+      last_transaction = Tran.where.not(balance: nil).last
+      @tran[:balance] = last_transaction[:balance] - @tran[:amount]
+    else
     if current_user.tier1?
       @tran[:externaluserapproval] == 'false_extuser'
     else
@@ -147,7 +182,7 @@ class TransController < ApplicationController
       @tran[:isEligibleForTier1] = 'true_tier_1'
       @tran[:status] = "pending"
     end
-
+  end
     @tran
   end
 
