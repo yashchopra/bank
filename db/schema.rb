@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171022013719) do
+ActiveRecord::Schema.define(version: 20171023042824) do
 
   create_table "accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "acctype"
@@ -31,8 +31,9 @@ ActiveRecord::Schema.define(version: 20171022013719) do
     t.datetime "updated_at", null: false
     t.string "transfer_account"
     t.integer "status"
-    t.boolean "isCritical"
-    t.boolean "isEligibleForTier1"
+    t.integer "isCritical"
+    t.integer "isEligibleForTier1"
+    t.integer "monthly_payment"
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -69,7 +70,7 @@ ActiveRecord::Schema.define(version: 20171022013719) do
     t.string "zip"
     t.string "updated_email"
     t.string "updated_phone"
-    t.string "status"
+    t.integer "status"
     t.datetime "password_changed_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["encrypted_otp_secret_key"], name: "index_users_on_encrypted_otp_secret_key", unique: true
