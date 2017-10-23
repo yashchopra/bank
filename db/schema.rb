@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171022013719) do
+ActiveRecord::Schema.define(version: 20171023011935) do
 
   create_table "accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "acctype"
@@ -31,8 +31,8 @@ ActiveRecord::Schema.define(version: 20171022013719) do
     t.datetime "updated_at", null: false
     t.string "transfer_account"
     t.integer "status"
-    t.boolean "isCritical"
-    t.boolean "isEligibleForTier1"
+    t.integer "isCritical"
+    t.integer "isEligibleForTier1"
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -46,9 +46,6 @@ ActiveRecord::Schema.define(version: 20171022013719) do
     t.datetime "last_sign_in_at"
     t.string "current_sign_in_ip"
     t.string "last_sign_in_ip"
-    t.integer "failed_attempts", default: 0, null: false
-    t.string "unlock_token"
-    t.datetime "locked_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "role"
@@ -59,6 +56,9 @@ ActiveRecord::Schema.define(version: 20171022013719) do
     t.string "direct_otp"
     t.datetime "direct_otp_sent_at"
     t.timestamp "totp_timestamp"
+    t.integer "failed_attempts", default: 0, null: false
+    t.string "unlock_token"
+    t.datetime "locked_at"
     t.string "phone"
     t.string "first_name"
     t.string "last_name"
@@ -69,8 +69,10 @@ ActiveRecord::Schema.define(version: 20171022013719) do
     t.string "zip"
     t.string "updated_email"
     t.string "updated_phone"
-    t.string "status"
+    t.integer "status"
     t.datetime "password_changed_at"
+    t.integer "externaluserapproval"
+    t.string "transactioninfo"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["encrypted_otp_secret_key"], name: "index_users_on_encrypted_otp_secret_key", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true

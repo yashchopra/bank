@@ -31,5 +31,6 @@ class User < ApplicationRecord
 		@code = code
 		UserMailer.signup_confirmation(email, @code).deliver
 	end
-
 end
+
+
