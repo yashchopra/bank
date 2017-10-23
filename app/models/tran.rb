@@ -4,6 +4,8 @@ class Tran < ApplicationRecord
   enum status: [:pending, :approve, :decline]
   enum isCritical: [:true, :false]
   enum isEligibleForTier1: [:true_tier_1, :false_tier_1]
+  enum externaluserapproval: [:true_extuser, :false_extuser]
+
 
   validates_presence_of :amount
   validate :amount_type

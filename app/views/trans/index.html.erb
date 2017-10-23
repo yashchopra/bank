@@ -12,6 +12,7 @@
         <table>
           <tbody>
           <tr>
+            <td><%= tran.account %></td>                      
             <td><%= tran.amount %></td>
             <td><%= render tran, account: Account.find_by(id: tran.account_id) %></td>
           </tr>
