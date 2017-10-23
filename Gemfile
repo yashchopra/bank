@@ -70,3 +70,6 @@ end
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_security_extension.git'
+gem 'coffee-script-source', '1.8.0'
+gem 'wicked_pdf'
+gem 'wkhtmltopdf-binary'

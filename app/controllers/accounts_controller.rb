@@ -14,8 +14,25 @@ class AccountsController < ApplicationController
   # GET /accounts/1.json
   def show
     @trans = @account.trans.all
-  end
+    respond_to do |format|
+      format.pdf do
+        render :pdf => 'Account_Statement',
+               :disposition => 'attachment',
+               :template => "accounts/show.pdf.erb"
 
+      end
+
+      format.html
+    end
+  end
+  def download
+    html = render_to_string(:action => :show)
+    pdf = WickedPdf.new.pdf_from_string(html)
+
+    send_data(pdf,
+              :filename => 'testpdf.pdf',
+              :disposition => 'attachment')
+  end
   # GET /accounts/new
   def new
     @account = @user.accounts.new

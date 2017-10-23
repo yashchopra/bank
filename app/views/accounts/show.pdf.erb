@@ -1,0 +1,55 @@
+<p id="notice"><%= notice %></p>
+
+<div class="container">
+  <div class="row">
+    <div class="col m12 offset-m0">
+
+      <table>
+        <tbody>
+        <tr>
+          <td>
+            <strong>Acctype:</strong>
+            <%= @account.acctype %>
+          </td>
+          <td>
+            <strong>Accnumber:</strong>
+            <%= @account.accnumber %>
+          </td>
+          <td>
+            <strong>Accrouting:</strong>
+            <%= @account.accrouting %>
+          </td>
+          <td>
+            <strong>User:</strong>
+            <%= @account.user_id %>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+
+
+      <table class="highlight">
+        <thead>
+        <tr>
+          <th>Amount</th>
+          <th>Transaction Type</th>
+          <th>Balance</th>
+        </tr>
+        </thead>
+
+        <tbody>
+        <% @trans.each do |tran| %>
+            <tr>
+              <td><%= tran.amount %></td>
+              <td><%= tran.credit %></td>
+              <td><%= tran.balance %></td>
+            </tr>
+        <% end %>
+        </tbody>
+
+      </table>
+
+    </div>
+  </div>
+</div>
+
