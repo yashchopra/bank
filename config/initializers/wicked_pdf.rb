@@ -13,7 +13,9 @@ WickedPdf.config = {
   # one of the wkhtmltopdf-binary family of gems.
   # exe_path: '/usr/local/bin/wkhtmltopdf',
   #   or
-   exe_path: 'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+   #exe_path: 'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
+        exe_path: 'wkhtmltopdf.exe'
+
 
   # Layout file to be used for all PDFs
   # (but can be overridden in `render :pdf` calls)
