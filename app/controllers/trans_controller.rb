@@ -7,13 +7,13 @@ class TransController < ApplicationController
   # GET /trans.json
   def index
     if current_user.tier1?
-      @trans = Tran.where(status: 'pending')
+      @trans = Tran.where(status: 'pending').and(Trans.where(isEligibleForTier1: 'true_tier_1'))
+      @user = User.where(role: 'customer').or(User.where(role: 'organization'))
+    elsif current_user.tier2?
+      @trans = Tran.find_all(status: 'pending')
       @user = User.where(role: 'customer').or(User.where(role: 'organization'))
     else
       user_not_authorized and return
-    end
-    if current_user.tier1?
-      @users_to_be_approved = User.where(status: 'pending')
     end
   end
 
