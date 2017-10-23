@@ -53,10 +53,10 @@ class UsersController < ApplicationController
     authorize @user
 
     if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
-      redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'
+      redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
       # format.json { render :show, status: :ok, location: @user }
     else
-      redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull'
+      redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull' and return
       # format.json { render json: @account.errors, status: :unprocessable_entity }
       updated_user_params = user_params
       if user_params['status']
@@ -74,6 +74,7 @@ class UsersController < ApplicationController
           format.json {render json: @user.errors, status: :unprocessable_entity}
         end
       end
+    end
     end
 
     def log
@@ -123,4 +124,4 @@ class UsersController < ApplicationController
     end
 
   end
-end
+

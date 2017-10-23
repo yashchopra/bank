@@ -7,13 +7,13 @@ class TransController < ApplicationController
   # GET /trans.json
   def index
     if current_user.tier1?
-      @trans = Tran.find_all(status: 'pending')
-      @user = User.find_all(role: 'customer').or(User.find_all(role: 'organization'))
+      @trans = Tran.where(status: 'pending')
+      @user = User.where(role: 'customer').or(User.where(role: 'organization'))
     else
       user_not_authorized and return
     end
     if current_user.tier1?
-      @users_to_be_approved = User.find_all(status: 'pending')
+      @users_to_be_approved = User.where(status: 'pending')
     end
   end
 
@@ -205,14 +205,14 @@ class TransController < ApplicationController
       current_acc = Account.find_by(id: @tran[:account_id])
       current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
       Tran.create(:amount => @tran[:amount].to_s,
-                  :credit => 'request',
+                  :credit => 'credit',
                   :balance => current_tran_last_balance[:balance] + @tran[:amount],
                   :user_id => current_acc[:user_id],
                   :account_id => current_acc[:id],
                   :created_at => DateTime,
                   :updated_at => DateTime,
                   :transfer_account => @tran[:account_id])
-      Tran.delete(id:  @tran[:id])
+      Tran.find_by(id: @tran[:id]).delete
     elsif tran_params[:status] == 'decline'
       @tran.update_attributes(:explanation => 'Your transaction was declined')
     end
@@ -223,37 +223,37 @@ class TransController < ApplicationController
       current_acc = Account.find_by(id: @tran[:account_id])
       current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
       Tran.create(:amount => @tran[:amount].to_s,
-                  :credit => 'request',
+                  :credit => 'debit',
                   :balance => current_tran_last_balance[:balance] - @tran[:amount],
                   :user_id => current_acc[:user_id],
                   :account_id => current_acc[:id],
                   :created_at => DateTime,
                   :updated_at => DateTime,
                   :transfer_account => @tran[:account_id])
-      Tran.delete(id:  @tran[:id])
+      Tran.find_by(id: @tran[:id]).delete
     elsif tran_params[:status] == 'decline'
       @tran.update_attributes(:explanation => 'Your transaction was declined')
     end
   end
 
   def do_request_transaction_calculations
-
     if tran_params[:status] == 'approve'
       rec_acc = find_account
-      # rec_acc = Account.find_by(accnumber: account_to_transfer)
       rec_acc_last_transaction = rec_acc.trans.where.not(balance: nil).last
       Tran.create(:amount => @tran[:amount].to_s,
-                  :credit => 'request',
+                  :credit => 'debit',
                   :balance => rec_acc_last_transaction[:balance] - @tran[:amount],
                   :user_id => rec_acc[:user_id],
                   :account_id => rec_acc[:id],
                   :created_at => DateTime,
                   :updated_at => DateTime,
                   :transfer_account => @tran[:account_id])
+
+      Tran.find_by(id: @tran[:id]).delete
       current_acc = Account.find_by(id: @tran[:account_id])
       current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
       Tran.create(:amount => @tran[:amount].to_s,
-                  :credit => 'request',
+                  :credit => 'credit',
                   :balance => current_tran_last_balance[:balance] + @tran[:amount],
                   :user_id => current_acc[:user_id],
                   :account_id => current_acc[:id],
@@ -271,8 +271,7 @@ class TransController < ApplicationController
 
   def do_transfer_transaction_calculations
     if tran_params[:status] == 'approve'
-      account_to_transfer = find_account
-      rec_acc = Account.find_by_accnumber(account_to_transfer)
+      rec_acc = find_account
       rec_acc_last_transaction = rec_acc.trans.where.not(balance: nil).last
       Tran.create(:amount => @tran[:amount].to_s,
                   :credit => 'credit',
@@ -282,12 +281,23 @@ class TransController < ApplicationController
                   :created_at => DateTime,
                   :updated_at => DateTime,
                   :transfer_account => @tran[:account_id])
+      Tran.find_by(id: @tran[:id]).delete
+      current_acc = Account.find_by(id: @tran[:account_id])
+      current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
+      Tran.create(:amount => @tran[:amount].to_s,
+                  :credit => 'debit',
+                  :balance => current_tran_last_balance[:balance] + @tran[:amount],
+                  :user_id => current_acc[:user_id],
+                  :account_id => current_acc[:id],
+                  :created_at => DateTime,
+                  :updated_at => DateTime,
+                  :transfer_account => @tran[:account_id])
     elsif tran_params[:status] == 'decline'
       current_acc = Account.find_by(id: @tran[:account_id])
       current_acc_last_transaction = current_acc.trans.where.not(balance: nil).last
       Tran.create(:amount => @tran[:amount].to_s,
                   :credit => 'credit',
-                  :balance => current_acc_last_transaction[:balance] + @tran[:amount],
+                  :balance => current_acc_last_transaction[:balance] - @tran[:amount],
                   :user_id => current_acc[:user_id],
                   :account_id => current_acc[:id],
                   :created_at => DateTime,
