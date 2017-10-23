@@ -1,13 +1,16 @@
 class Tran < ApplicationRecord
   belongs_to :account
-  enum credit: [:credit, :debit, :transfer, :request, :pay, :spend]
+  enum credit: [:credit, :debit, :transfer, :request, :pay, :spend, :fee]
   enum status: [:pending, :approve, :decline]
   enum isCritical: [:true, :false]
   enum isEligibleForTier1: [:true_tier_1, :false_tier_1]
+  enum externaluserapproval: [:true_extuser, :false_extuser]
+
 
   validates_presence_of :amount
   validate :amount_type
   validate :deductible_amount, :if => :transaction_type_is_transfer_or_debit?
+  validate :cc_deductible_amount, :if => :transaction_type_is_pay_spend?
 
 
   validates_presence_of :transfer_account, :if => :transaction_type_is_transfer_or_request?
@@ -15,13 +18,25 @@ class Tran < ApplicationRecord
 
 
   def amount_type
-    if amount <= 0
+    if amount < 0
       errors.add(:amount, "invalid")
     end
   end
 
   def transaction_type_is_transfer_or_request?
     true if ["request", "transfer"].include? credit
+  end
+
+  def cc_deductible_amount
+    current_acc = Account.find_by_id(account_id)
+    last_transaction = current_acc.trans.where.not(balance: nil).last
+    if last_transaction['id'] != id and (amount + last_transaction['balance']).ti_int > 2000 and credit != fee
+      errors.add(:amount, "Your balance will exceed credit limit. Transaction cancelled")
+    end
+  end
+
+  def transaction_type_is_transfer_or_request?
+    true if ["pay", "spend"].include? credit
   end
 
   def transaction_type_is_transfer_or_debit?

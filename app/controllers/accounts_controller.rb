@@ -47,7 +47,7 @@ class AccountsController < ApplicationController
     @user.accounts.all.pluck(:acctype).each do |type|
       @account_types.delete(type)
       @acc_counter = @acc_counter - 1
-      end
+    end
   end
 
   # GET /accounts/1/edit
@@ -69,7 +69,9 @@ class AccountsController < ApplicationController
         format.json { render json: @account.errors, status: :unprocessable_entity }
       end
     end
-    add_initial_ammount(account_params)
+
+      add_initial_ammount(account_params)
+
   end
 
   # PATCH/PUT /accounts/1
@@ -114,6 +116,7 @@ class AccountsController < ApplicationController
     end
 
   def add_initial_ammount(account_params)
+    if @account[:acctype] != "Credit Card"
     Tran.create(:amount => 2000,
                 :credit => 'credit',
                 :balance => 2000,
@@ -122,7 +125,18 @@ class AccountsController < ApplicationController
                 :created_at => DateTime,
                 :updated_at => DateTime,
                 :transfer_account => 'Initial Amount')
-  end
+    else
+      Tran.create(:amount => 0,
+                  :credit => 'credit',
+                  :balance => 0,
+                  :user_id => @user.id,
+                  :account_id => @account.id,
+                  :created_at => DateTime,
+                  :updated_at => DateTime,
+                  :transfer_account => 'Initial Amount')
+      end
+    end
+
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def account_params

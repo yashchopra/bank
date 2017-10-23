@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171023025307) do
+ActiveRecord::Schema.define(version: 20171022013719) do
 
   create_table "accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "acctype"
@@ -31,8 +31,8 @@ ActiveRecord::Schema.define(version: 20171023025307) do
     t.datetime "updated_at", null: false
     t.string "transfer_account"
     t.integer "status"
-    t.integer "isCritical"
-    t.integer "isEligibleForTier1"
+    t.boolean "isCritical"
+    t.boolean "isEligibleForTier1"
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -69,8 +69,10 @@ ActiveRecord::Schema.define(version: 20171023025307) do
     t.string "zip"
     t.string "updated_email"
     t.string "updated_phone"
-    t.integer "status"
+    t.string "status"
     t.datetime "password_changed_at"
+    t.integer "externaluserapproval"
+    t.string "transactioninfo"
     t.string "ssn"
     t.string "ssn_hash"
     t.string "ssn_ciphertext"
