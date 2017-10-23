@@ -12,7 +12,8 @@
         <table>
           <tbody>
           <tr>
-            <td><%= tran.account %></td>                      
+            <td><%= Account.find_by_id(tran.account_id)[:accnumber
+] %></td>
             <td><%= tran.amount %></td>
             <td><%= render tran, account: Account.find_by(id: tran.account_id) %></td>
           </tr>
@@ -23,7 +24,7 @@
 
   <div style="width: 40%;overflow:auto;">
     <h5>Update Users</h5>
-    <% @users_to_be_approved.each do |updateuser| %>
+    <% @user.each do |updateuser| %>
         <tr>
           <td><%= updateuser.updated_email %></td>
           <td><%= updateuser.updated_phone %></td>

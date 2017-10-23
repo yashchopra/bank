@@ -7,7 +7,7 @@ class TransController < ApplicationController
   # GET /trans.json
   def index
     if current_user.tier1?
-      @trans = Tran.where(status: 'pending').and(Trans.where(isEligibleForTier1: 'true_tier_1'))
+      @trans = Tran.where(status: 'pending', isEligibleForTier1: 'true_tier_1')
       @user = User.where(role: 'customer').or(User.where(role: 'organization'))
     elsif current_user.tier2?
       @trans = Tran.find_all(status: 'pending')

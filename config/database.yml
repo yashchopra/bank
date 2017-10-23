@@ -22,8 +22,8 @@
 
 # production:
 #   <<: *default
-#   database: db/production.sqlite3
-
+#   datab
+#
 
 development:
  adapter: mysql2
@@ -31,4 +31,4 @@ development:
  database: db/development/mysql
  pool: 5
  username: root
- password: root
+ password: password
