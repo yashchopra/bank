@@ -112,6 +112,11 @@ class TransController < ApplicationController
     # This query is used to find the account balance
     #last_transaction = Tran.where.not(balance: nil).last
     #@tran[:balance] = last_transaction[:balance] + @tran[:amount]
+    if current_user.tier1?
+      @tran[:externaluserapproval] == 'false_extuser'
+    else
+      @tran[:externaluserapproval] == 'true_extuser'
+    end
     if @tran[:amount]>100000
       @tran[:isEligibleForTier1] = 'false_tier_1'
       @tran[:status] = "pending"
@@ -128,6 +133,11 @@ class TransController < ApplicationController
     # This query is used to find the account balance
     # last_transaction = Tran.where.not(balance: nil).last
     # @tran[:balance] = last_transaction[:balance] - @tran[:amount]
+    if current_user.tier1?
+      @tran[:externaluserapproval] == 'false_extuser'
+    else
+      @tran[:externaluserapproval] == 'true_extuser'
+    end
     if @tran[:amount]>100000
       @tran[:isCritical] = 'true'
       @tran[:isEligibleForTier1] = 'false_tier_1'
@@ -142,6 +152,11 @@ class TransController < ApplicationController
   end
 
   def transfer_money
+    if current_user.tier1?
+      @tran[:externaluserapproval] == 'false_extuser'
+    else
+      @tran[:externaluserapproval] == 'true_extuser'
+    end
     if @tran[:amount]>100000
       current_acc = Account.find_by(id: @tran[:account_id])
       current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
@@ -175,6 +190,11 @@ class TransController < ApplicationController
   end
 
   def request_money
+    if current_user.tier1?
+      @tran[:externaluserapproval] == 'false_extuser'
+    else
+      @tran[:externaluserapproval] == 'true_extuser'
+    end
     if @tran[:amount]>100000
       @tran[:isCritical] = 'true'
       @tran[:isEligibleForTier1] = 'false_tier_1'
