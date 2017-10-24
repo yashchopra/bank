@@ -6,6 +6,7 @@ class AccountsController < ApplicationController
   # GET /accounts
   # GET /accounts.json
   def index
+    prevent_tier1_account_creation
     @accounts = @user.accounts.all
     # @accounts = Account.all
   end
@@ -25,6 +26,7 @@ class AccountsController < ApplicationController
       format.html
     end
   end
+
   def download
     html = render_to_string(:action => :show)
     pdf = WickedPdf.new.pdf_from_string(html)
@@ -33,6 +35,7 @@ class AccountsController < ApplicationController
               :filename => 'testpdf.pdf',
               :disposition => 'attachment')
   end
+
   # GET /accounts/new
   def new
     @account = @user.accounts.new
@@ -40,7 +43,7 @@ class AccountsController < ApplicationController
       @account_types = ['Checking']
       @acc_counter = 1
     else
-      @account_types = ['Checking','Savings','Credit Card']
+      @account_types = ['Checking', 'Savings', 'Credit Card']
       @acc_counter = 3
     end
 
@@ -62,15 +65,15 @@ class AccountsController < ApplicationController
 
     respond_to do |format|
       if @account.save
-        format.html { redirect_to user_account_path(current_user, @account), notice: 'Account was successfully created.' }
-        format.json { render :show, status: :created, location: @account }
+        format.html {redirect_to user_account_path(current_user, @account), notice: 'Account was successfully created.'}
+        format.json {render :show, status: :created, location: @account}
       else
-        format.html { render :new }
-        format.json { render json: @account.errors, status: :unprocessable_entity }
+        format.html {render :new}
+        format.json {render json: @account.errors, status: :unprocessable_entity}
       end
     end
 
-      add_initial_ammount(account_params)
+    add_initial_ammount(account_params)
 
   end
 
@@ -79,11 +82,11 @@ class AccountsController < ApplicationController
   def update
     respond_to do |format|
       if @account.update(account_params)
-        format.html { redirect_to user_account_path(@user, @account), notice: 'Account was successfully updated.' }
-        format.json { render :show, status: :ok, location: @account }
+        format.html {redirect_to user_account_path(@user, @account), notice: 'Account was successfully updated.'}
+        format.json {render :show, status: :ok, location: @account}
       else
-        format.html { render :edit }
-        format.json { render json: @account.errors, status: :unprocessable_entity }
+        format.html {render :edit}
+        format.json {render json: @account.errors, status: :unprocessable_entity}
       end
     end
   end
@@ -93,38 +96,38 @@ class AccountsController < ApplicationController
   def destroy
     @account.destroy
     respond_to do |format|
-      format.html { redirect_to user_accounts_path(@user), notice: 'Account was successfully destroyed.' }
-      format.json { head :no_content }
+      format.html {redirect_to user_accounts_path(@user), notice: 'Account was successfully destroyed.'}
+      format.json {head :no_content}
     end
   end
 
   private
-    # Use callbacks to share common setup or constraints between actions.
-    def set_account
-      @account = Account.find(params[:id])
-    end
+  # Use callbacks to share common setup or constraints between actions.
+  def set_account
+    @account = Account.find(params[:id])
+  end
 
-    def set_user
-      if current_user.admin? or current_user.tier2?
-        redirect_to users_url
-      elsif current_user.customer? or current_user.organization?
-        @user = current_user
-      elsif current_user.tier1?
-        @user = User.find(params[:user_id])
-        # @user = @account.user_id
-      end
+  def set_user
+    if current_user.admin? or current_user.tier2?
+      redirect_to users_url
+    elsif current_user.customer? or current_user.organization?
+      @user = current_user
+    elsif current_user.tier1?
+      @user = User.find(params[:user_id])
+      # @user = @account.user_id
     end
+  end
 
   def add_initial_ammount(account_params)
     if @account[:acctype] != "Credit Card"
-    Tran.create(:amount => 2000,
-                :credit => 'credit',
-                :balance => 2000,
-                :user_id => @user.id,
-                :account_id => @account.id,
-                :created_at => DateTime,
-                :updated_at => DateTime,
-                :transfer_account => 'Initial Amount')
+      Tran.create(:amount => 2000,
+                  :credit => 'credit',
+                  :balance => 2000,
+                  :user_id => @user.id,
+                  :account_id => @account.id,
+                  :created_at => DateTime,
+                  :updated_at => DateTime,
+                  :transfer_account => 'Initial Amount')
     else
       Tran.create(:amount => 0,
                   :credit => 'credit',
@@ -134,12 +137,17 @@ class AccountsController < ApplicationController
                   :created_at => DateTime,
                   :updated_at => DateTime,
                   :transfer_account => 'Initial Amount')
-      end
     end
+  end
 
-
-    # Never trust parameters from the scary internet, only allow the white list through.
-    def account_params
-      params.require(:account).permit(:acctype, :accnumber, :accrouting, :user_id)
+  def prevent_tier1_account_creation
+    if current_user == @user && (current_user.tier1? || current_user.tier2?)
+      redirect_to users_url and return
     end
+  end
+
+  # Never trust parameters from the scary internet, only allow the white list through.
+  def account_params
+    params.require(:account).permit(:acctype, :accnumber, :accrouting, :user_id)
+  end
 end

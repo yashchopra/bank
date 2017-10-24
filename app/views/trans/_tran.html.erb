@@ -1,5 +1,10 @@
 
 <%= form_for([account, tran]) do |f| %>
+    <span> Approve this transaction? </span>
     <%= f.select(:status, Tran.statuses.keys.map {|status| [status.titleize, status]})%>
+     <% if !current_user.tier1? %>
+        <span>Can this transaction be handled by Tier 1?</span>
+        <%= f.select(:isEligibleForTier1, Tran.isEligibleForTier1s.keys.map {|isEligibleForTier1| [isEligibleForTier1.titleize, isEligibleForTier1]})%>
+    <% end %>
     <button> <%= f.submit 'Update info'%> </button>
 <% end %>

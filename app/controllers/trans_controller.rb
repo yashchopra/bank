@@ -7,7 +7,7 @@ class TransController < ApplicationController
   # GET /trans.json
   def index
     if current_user.tier1?
-      @trans = Tran.where(status: 'pending', isEligibleForTier1: 'true_tier_1')
+      @trans = Tran.where(status: 'pending', isEligibleForTier1: 'yes')
       @user = User.where(role: 'customer').or(User.where(role: 'organization'))
     elsif current_user.tier2?
       @trans = Tran.find_all(status: 'pending')
@@ -142,17 +142,17 @@ class TransController < ApplicationController
     else
     #@tran[:balance] = last_transaction[:balance] + @tran[:amount]
     if current_user.tier1?
-      @tran[:externaluserapproval] == 'false_extuser'
+      @tran[:externaluserapproval] == 'reject'
     else
-      @tran[:externaluserapproval] == 'true_extuser'
+      @tran[:externaluserapproval] == 'accept'
     end
     if @tran[:amount]>100000
-      @tran[:isEligibleForTier1] = 'false_tier_1'
+      @tran[:isEligibleForTier1] = 'no'
       @tran[:status] = "pending"
       @tran[:isCritical] = 'true'
     else
       @tran[:isCritical] = "false"
-      @tran[:isEligibleForTier1] = "true_tier_1"
+      @tran[:isEligibleForTier1] = "yes"
       @tran[:status] = "pending"
     end
     end
@@ -169,17 +169,17 @@ class TransController < ApplicationController
       @tran[:balance] = last_transaction[:balance] - @tran[:amount]
     else
     if current_user.tier1?
-      @tran[:externaluserapproval] == 'false_extuser'
+      @tran[:externaluserapproval] == 'reject'
     else
-      @tran[:externaluserapproval] == 'true_extuser'
+      @tran[:externaluserapproval] == 'accept'
     end
     if @tran[:amount]>100000
       @tran[:isCritical] = 'true'
-      @tran[:isEligibleForTier1] = 'false_tier_1'
+      @tran[:isEligibleForTier1] = 'no'
       @tran[:status] = "pending"
     else
       @tran[:isCritical] = 'false'
-      @tran[:isEligibleForTier1] = 'true_tier_1'
+      @tran[:isEligibleForTier1] = 'yes'
       @tran[:status] = "pending"
     end
   end
@@ -188,9 +188,9 @@ class TransController < ApplicationController
 
   def transfer_money
     if current_user.tier1?
-      @tran[:externaluserapproval] == 'false_extuser'
+      @tran[:externaluserapproval] == 'reject'
     else
-      @tran[:externaluserapproval] == 'true_extuser'
+      @tran[:externaluserapproval] == 'accept'
     end
     if @tran[:amount]>100000
       current_acc = Account.find_by(id: @tran[:account_id])
@@ -198,10 +198,10 @@ class TransController < ApplicationController
       @tran[:status] = "pending"
       # @tran[:balance] = current_tran_last_balance[:balance] - @tran[:amount]
       @tran[:isCritical] = 'true'
-      @tran[:isEligibleForTier1] = 'false_tier_1'
+      @tran[:isEligibleForTier1] = 'no'
     else
       @tran[:isCritical] = 'false'
-      @tran[:isEligibleForTier1] = 'true_tier_1'
+      @tran[:isEligibleForTier1] = 'yes'
       @tran[:status] = "pending"
 
       # rec_acc = find_account
@@ -226,17 +226,17 @@ class TransController < ApplicationController
 
   def request_money
     if current_user.tier1?
-      @tran[:externaluserapproval] == 'false_extuser'
+      @tran[:externaluserapproval] == 'reject'
     else
-      @tran[:externaluserapproval] == 'true_extuser'
+      @tran[:externaluserapproval] == 'accept'
     end
     if @tran[:amount]>100000
       @tran[:isCritical] = 'true'
-      @tran[:isEligibleForTier1] = 'false_tier_1'
+      @tran[:isEligibleForTier1] = 'no'
       @tran[:status] = "pending"
     else
       @tran[:isCritical] = 'false'
-      @tran[:isEligibleForTier1] = 'true_tier_1'
+      @tran[:isEligibleForTier1] = 'yes'
       @tran[:status] = "pending"
     end
 
