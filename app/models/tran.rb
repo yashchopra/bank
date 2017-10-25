@@ -3,8 +3,8 @@ class Tran < ApplicationRecord
   enum credit: [:credit, :debit, :transfer, :request, :pay, :spend, :fee]
   enum status: [:pending, :approve, :decline]
   enum isCritical: [:true, :false]
-  enum isEligibleForTier1: [:true_tier_1, :false_tier_1]
-  enum externaluserapproval: [:true_extuser, :false_extuser]
+  enum isEligibleForTier1: [:yes, :no]
+  enum externaluserapproval: [:accept, :reject]
 
 
   validates_presence_of :amount

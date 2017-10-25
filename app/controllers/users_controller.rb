@@ -53,75 +53,63 @@ class UsersController < ApplicationController
     authorize @user
 
     if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
-      redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
-      # format.json { render :show, status: :ok, location: @user }
-    else
-      redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull' and return
-      # format.json { render json: @account.errors, status: :unprocessable_entity }
       updated_user_params = user_params
       if user_params['status']
-        updated_user_params = check_status_function
-        puts "yash"
+        check_status_function
       elsif user_params['updated_email'] or user_params['updated_phone']
         @user.update_attributes(:status => 'pending')
       end
-
-      respond_to do |format|
-        if @user.update(updated_user_params)
-          format.html {redirect_to user_accounts_path(@current_user), notice: 'Changes acknoledged'}
-        else
-          format.html {render :edit}
-          format.json {render json: @user.errors, status: :unprocessable_entity}
-        end
-      end
+      redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
+    else
+      redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull' and return
     end
-    end
+  end
 
-    def log
-      @user = current_user
-      authorize @user
+  def log
+    @user = current_user
+    authorize @user
 
-      lines = params[:lines]
-      if Rails.env == "production"
-        @logs = `tail -n #{lines} log/production.log`
-      else
-        @logs = `tail -n #{lines} log/development.log`
-      end
+    lines = params[:lines]
+    if Rails.env == "production"
+      @logs = `tail -n #{lines} log/production.log`
+    else
+      @logs = `tail -n #{lines} log/development.log`
     end
+  end
 
 
   def user_params
     params.require(:user).permit(:role, :email, :password, :password_confirmation, :phone, :first_name, :last_name, :city, :state, :country, :street, :zip, :updated_email, :updated_phone, :status)
   end
 
-    def correct_user_list
-      if current_user.role == 'admin'
-        @users = User.where(role: ["admin", "tier1", "tier2"])
-      elsif current_user.role == 'tier1'
-        @users = User.where(role: ["customer", "organization"])
-      elsif current_user.role == 'tier2'
-        @users = User.where(role: ["admin", "tier1", "tier2", "customer", "organization"])
-      end
+  def correct_user_list
+    if current_user.role == 'admin'
+      @users = User.where(role: ["admin", "tier1", "tier2"])
+    elsif current_user.role == 'tier1'
+      @users = User.where(role: ["customer", "organization"])
+    elsif current_user.role == 'tier2'
+      @users = User.where(role: ["admin", "tier1", "tier2", "customer", "organization"])
     end
-
-
-    def check_status_function
-      if user_params['status'] == 'approve'
-        if @user[:updated_email]
-          @user.update_attributes(:email => @user[:updated_email], :updated_email => nil)
-          # @user[:updated_email] = nil
-        end
-        if @user[:updated_phone]
-          @user.update_attributes(:phone => @user[:updated_phone], :updated_phone => nil)
-          # @user[:phone] = @user[:updated_phone]
-        end
-      elsif user_params['status'] == 'declined'
-        @user.update_attributes(:updated_email => nil, :updated_phone => nil)
-        # @user[:updated_phone] = @user[:updated_email] = nil
-        user_params['status'] = nil
-      end
-      user_params
-    end
-
   end
+
+
+  def check_status_function
+    if user_params['status'] == 'approve'
+      if @user[:updated_email]
+        @user.update_attributes(:email => @user[:updated_email], :updated_email => nil)
+        # @user[:updated_email] = nil
+      end
+      if @user[:updated_phone]
+        @user.update_attributes(:phone => @user[:updated_phone], :updated_phone => nil)
+        # @user[:phone] = @user[:updated_phone]
+      end
+    elsif user_params['status'] == 'declined'
+      @user.update_attributes(:updated_email => nil, :updated_phone => nil)
+      # @user[:updated_phone] = @user[:updated_email] = nil
+      user_params['status'] = nil
+    end
+    user_params
+  end
+
+end
 
