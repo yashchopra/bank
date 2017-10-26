@@ -54,11 +54,7 @@ class UsersController < ApplicationController
 
     if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
       updated_user_params = user_params
-      if user_params['status']
-        check_status_function
-      elsif user_params['updated_email'] or user_params['updated_phone']
-        @user.update_attributes(:status => 'pending')
-      end
+      do_update_calculations
       redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
     else
       redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull' and return
@@ -92,6 +88,42 @@ class UsersController < ApplicationController
     end
   end
 
+  def do_update_calculations
+    check_user_and_approval_level
+    if user_params['status']
+      check_status_function
+    elsif user_params['updated_email'] or user_params['updated_phone']
+      @user.update_attributes(:status => 'pending')
+    end
+  end
+
+  def check_user_and_approval_level
+    if current_user.tier1? and (@user.customer? or @user.organization?)
+      @user.update_attributes(:externaluserapproval => 'reject')
+      if critical_information
+        @user.update_attributes(:isEligibleForTier1 => 'no')
+      else
+        @user.update_attributes(:isEligibleForTier1 => 'yes')
+      end
+    elsif current_user.customer? or current_user.organization?
+      @user.update_attributes(:externaluserapproval => 'accept')
+      if critical_information
+        @user.update_attributes(:isEligibleForTier1 => 'no')
+      else
+        @user.update_attributes(:isEligibleForTier1 => 'yes')
+      end
+    elsif current_user.tier1? and @user.tier1?
+      @user.update_attributes(:isEligibleForTier1 => 'no')
+    end
+  end
+
+  def critical_information
+    is_critical = false
+    if @user[:updated_email] or @user[:updated_phone]
+      is_critical = true
+    end
+    is_critical
+  end
 
   def check_status_function
     if user_params['status'] == 'approve'

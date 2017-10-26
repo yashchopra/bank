@@ -4,12 +4,21 @@
       <h5 class="black-text">Sign up</h5>
       <%= form_for(@user) do |f| %>
 
-          <div class="row">
-            <div class="input-field col s12">
-              <%= f.label :updated_email %><br/>
-              <%= f.text_field :updated_email, autofocus: true %>
-            </div>
-          </div>
+          <% if check_athourity %>
+              <div class="row">
+                <div class="input-field col s12">
+                  <%= f.label :updated_email %><br/>
+                  <%= f.text_field :updated_email, autofocus: true %>
+                </div>
+              </div>
+          <% else %>
+              <div class="row">
+                <div class="input-field col s12">
+                  <%= f.label :email %><br/>
+                  <%= f.text_field :email, autofocus: true %>
+                </div>
+              </div>
+          <% end %>
 
           <div class="row">
             <div class="input-field col s6">
@@ -24,12 +33,23 @@
           </div>
 
 
-          <div class="row">
-            <div class="input-field col s6">
-              <%= f.label :updated_phone %><br/>
-              <%= f.text_field :updated_phone, autofocus: true %>
-            </div>
-          </div>
+          <% if check_athourity %>
+              <div class="row">
+                <div class="input-field col s6">
+                  <%= f.label :updated_phone %><br/>
+                  <%= f.text_field :updated_phone, autofocus: true %>
+                </div>
+              </div>
+          <% else %>
+              <div class="row">
+                <div class="input-field col s6">
+                  <%= f.label :phone %><br/>
+                  <%= f.text_field :phone, autofocus: true %>
+                </div>
+              </div>
+          <% end %>
+
+
 
           <div class="row">
             <div class="input-field col s12">
