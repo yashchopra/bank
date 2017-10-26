@@ -1,12 +1,20 @@
 <%= form_for(user) do |f| %>
 
-    <div class="row">
-      <div class="input-field col s12">
-        <%= f.label :email %><br/>
-        <%= f.email_field :email, autofocus: true %>
-      </div>
-    </div>
-
+    <% if check_athourity %>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= f.label :updated_email %><br/>
+            <%= f.text_field :updated_email, autofocus: true %>
+          </div>
+        </div>
+    <% else %>
+        <div class="row">
+          <div class="input-field col s12">
+            <%= f.label :email %><br/>
+            <%= f.text_field :email, autofocus: true %>
+          </div>
+        </div>
+    <% end %>
 
     <div class="row">
       <div class="input-field col s6">
@@ -28,12 +36,22 @@
     </div>
 
 
-    <div class="row">
-      <div class="input-field col s6">
-        <%= f.label :phone %><br/>
-        <%= f.text_field :phone, autofocus: true %>
-      </div>
-    </div>
+    <% if check_athourity %>
+        <div class="row">
+          <div class="input-field col s6">
+            <%= f.label :updated_phone %><br/>
+            <%= f.text_field :updated_phone, autofocus: true %>
+          </div>
+        </div>
+    <% else %>
+        <div class="row">
+          <div class="input-field col s6">
+            <%= f.label :phone %><br/>
+            <%= f.text_field :phone, autofocus: true %>
+          </div>
+        </div>
+    <% end %>
+
 
     <div class="row">
       <div class="input-field col s12">
@@ -65,7 +83,7 @@
         <%= f.text_field :zip, autofocus: true %>
       </div>
     </div>
-
+    <%= recaptcha_tags %>
     <div class="btn waves-effect waves-light" type="submit" name="action">
       <%= f.submit 'Update info' %>
     </div>
