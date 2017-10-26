@@ -31,6 +31,9 @@ gem 'hirb'
 # User session management
 gem "pundit"
 
+#letsencrypt gem
+gem 'rails-letsencrypt'
+
 gem 'rails_email_validator'
 
 # Use CoffeeScript for .coffee assets and views
