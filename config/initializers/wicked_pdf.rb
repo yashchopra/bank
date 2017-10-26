@@ -15,7 +15,7 @@ WickedPdf.config = {
   #   or
    #exe_path: 'C:\Program Files\wkhtmltopdf\bin\wkhtmltopdf.exe'
         #exe_path: 'wkhtmltopdf.exe'
-exe_path: 'wkhtmltox-0.12.4_linux-generic-amd64.tar'
+exe_path: 'wkhtmltox-0.12.4_linux-generic-amd64'
 
 
   # Layout file to be used for all PDFs
