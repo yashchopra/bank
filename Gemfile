@@ -24,7 +24,6 @@ gem 'materialize-sass'
 # User authorization
 gem 'devise'
 
-
 # Jquery
 gem 'jquery-rails'
 gem 'two_factor_authentication'
