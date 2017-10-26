@@ -7,6 +7,8 @@ class User < ApplicationRecord
 	enum role: [:tier2, :tier1, :admin, :customer, :organization]
 	enum status: [:pending, :approve, :decline]
 	after_initialize :set_default_role, :if => :new_record?
+	enum isEligibleForTier1: [:yes, :no]
+	enum externaluserapproval: [:accept, :reject]
 
 	# validates_presence_of :first_name
 	# validates_presence_of :last_name

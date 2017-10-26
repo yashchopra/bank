@@ -27,6 +27,10 @@ class Tran < ApplicationRecord
     true if ["request", "transfer"].include? credit
   end
 
+  def transaction_type_is_pay_spend?
+    true if ["pay", "spend"].include? credit
+  end
+
   def cc_deductible_amount
     current_acc = Account.find_by_id(account_id)
     last_transaction = current_acc.trans.where.not(balance: nil).last
@@ -76,6 +80,29 @@ class Tran < ApplicationRecord
       same_account = true if user_account[:accnumber] == transfer_account
     end
     same_account
+  end
+
+  def creditcard_interest
+    cc_accounts = Account.where(acctype: 'Credit Card')
+    cc_accounts.each do |account|
+      if account[:statement_balance]
+        fee_amount = statement_balance.to_int * 0.2
+        Tran.create(:amount => fee_amount,
+                    :credit => 'fee',
+                    :balance => statement_balance + fee_amount,
+                    :user_id => current_acc[:user_id],
+                    :account_id => current_acc[:id],
+                    :created_at => DateTime,
+                    :updated_at => DateTime,
+                    :transfer_account => @tran[:account_id])
+        account.update_attributes(:statement_balance => statement_balance + fee_amount)
+      end
+    end
+  end
+
+  def try
+    Rails.logger.info("CitrixIndex updated at #{Time.now}")
+    puts "Yash%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
   end
 
 end
