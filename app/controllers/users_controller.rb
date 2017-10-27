@@ -14,7 +14,9 @@ class UsersController < ApplicationController
   def index
     @users = correct_user_list
     authorize User
+
   end
+
 
   def edit
     @user = User.find(params[:id])
@@ -31,6 +33,7 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     authorize @user
+
   end
 
   def create
@@ -49,6 +52,7 @@ class UsersController < ApplicationController
   end
 
   def update
+
     @user = User.find(params[:id])
     authorize @user
 
@@ -79,6 +83,7 @@ class UsersController < ApplicationController
   end
 
   def correct_user_list
+    @users_list = ['admin', 'tier1', 'tier2']
     if current_user.role == 'admin'
       @users = User.where(role: ["admin", "tier1", "tier2"])
     elsif current_user.role == 'tier1'
@@ -86,6 +91,7 @@ class UsersController < ApplicationController
     elsif current_user.role == 'tier2'
       @users = User.where(role: ["admin", "tier1", "tier2", "customer", "organization"])
     end
+
   end
 
   def do_update_calculations
