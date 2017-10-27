@@ -53,7 +53,9 @@
               <td><%= tran.amount %></td>
               <td><%= tran.credit %></td>
               <td><%= tran.balance %></td>
+              <% if not current_user.customer? %>
               <td><%= link_to 'Destroy', account_tran_path(@account, tran), method: :delete, data: {confirm: 'Are you sure?'} %></td>
+            <%end%>
             </tr>
         <% end %>
         </tbody>

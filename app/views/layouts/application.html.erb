@@ -28,8 +28,12 @@
           <% end %>
           <li> <%= link_to "Update Profile", edit_users_admin_url(current_user) %> </li>
           <li><%= link_to "Sign Out", destroy_user_session_path, method: :delete %></li>
-          <li> <%= link_to "New User", new_users_admin_path %> </li>
-          <%= link_to "log file", log_path(current_user[:id], lines:100) %>
+          <% if not current_user.customer? %>
+            <li> <%= link_to "New User", new_users_admin_path %> </li>
+          <%end%>
+          <% if current_user.admin? %>
+            <%= link_to "log file", log_path(current_user[:id], lines:100) %>
+          <%end%>
       <% end %>
     </ul>
   </div>

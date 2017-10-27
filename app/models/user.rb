@@ -10,14 +10,21 @@ class User < ApplicationRecord
 	enum isEligibleForTier1: [:yes, :no]
 	enum externaluserapproval: [:accept, :reject]
 
+  encrypt :ssn, searchable: true, hash_salt: ENV["SECRET_KEY_BASE"], key: ENV["SECRET_KEY_BASE"]
+
 	# validates_presence_of :first_name
 	# validates_presence_of :last_name
 	# validates_presence_of :city
 	# validates_presence_of :state
 	# validates_presence_of :country
-	# validates_presence_of :zip
-  #
-	# validates_presence_of :phone
+
+	# validates :zip, :presence => true,
+	# 					      :numericality => true,
+	# 							  :length => {:minimum => 1}
+
+	# validates :phone,:presence => true,
+	# 					:numericality => true,
+	# 					:length => { :minimum => 10, :maximum => 10 }
 
 
 	def set_default_role  
