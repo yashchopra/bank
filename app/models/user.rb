@@ -11,17 +11,17 @@ class User < ApplicationRecord
 	enum externaluserapproval: [:accept, :reject]
 
   encrypt :ssn, searchable: true, hash_salt: ENV["SECRET_KEY_BASE"], key: ENV["SECRET_KEY_BASE"]
-
+  #
 	# validates_presence_of :first_name
 	# validates_presence_of :last_name
 	# validates_presence_of :city
 	# validates_presence_of :state
 	# validates_presence_of :country
-
+  #
 	# validates :zip, :presence => true,
 	# 					      :numericality => true,
 	# 							  :length => {:minimum => 1}
-
+  #
 	# validates :phone,:presence => true,
 	# 					:numericality => true,
 	# 					:length => { :minimum => 10, :maximum => 10 }
