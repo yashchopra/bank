@@ -18,7 +18,7 @@ class UsersController < ApplicationController
   def approval_screen
     authorize current_user
     if current_user.admin?
-      @user = User.where(role: ["admin", "tier1", "tier2"]).and(User.where (tier2_approval: 'deny'))
+      @user = User.where(role: "admin").or(User.where(role:"tier1")).or(User.where(role:"tier2")).and(User.where (tier2_approval: 'deny'))
     elsif current_user.tier2?
       @user = User.where(tier2_approval: 'deny')
     elsif current_user.customer? || current_user.organization?
