@@ -12,7 +12,7 @@ class UserPolicy
 	end
 
 	def new?
-		@current_user.admin? || @current_user.tier1?
+		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 
 	def index?
@@ -21,6 +21,10 @@ class UserPolicy
 
 	def show?
 		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
+	end
+
+	def approval_screen
+		@current_user == @user && (@current_user.customer? || @current_user.organization || 	@current_user.admin? || @current_user.tier2?)
 	end
 
 	def edit?

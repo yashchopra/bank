@@ -108,11 +108,11 @@ class AccountsController < ApplicationController
   end
 
   def set_user
-    if current_user.admin? or current_user.tier2?
+    if current_user.admin?
       redirect_to users_url
     elsif current_user.customer? or current_user.organization?
       @user = current_user
-    elsif current_user.tier1?
+    elsif current_user.tier1? or current_user.tier2?
       @user = User.find(params[:user_id])
       # @user = @account.user_id
     end

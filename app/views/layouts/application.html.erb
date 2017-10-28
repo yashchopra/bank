@@ -22,7 +22,7 @@
     <span class="brand-logo">CSE 545 - Bank (Group 9) </span>
     <ul id="nav-mobile" class="right hide-on-med-and-down valign-wrapper">
       <% if current_user %>
-          <% if current_user.tier1? %>
+          <% if current_user.tier1? or current_user.tier2? %>
               <li>  <%= link_to "Users", users_url %>
               <li>  <%= link_to "Financial Requests", account_trans_path(Account) %> </li>
           <% end %>

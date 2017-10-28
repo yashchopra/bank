@@ -6,6 +6,7 @@ Rails.application.routes.draw do
   end
 
   get 'users/:id/logs/:lines' => "users#log", as: "log"
+  get 'users/:id/approval_screen' => "users#approval_screen", as: "approval_screen"
 
   resources :accounts do
       resources :trans
