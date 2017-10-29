@@ -3,12 +3,12 @@ class AccountsController < ApplicationController
   before_action :verify_userapproval
   before_action :set_account, only: [:show, :edit, :update, :destroy]
   before_action :set_user
-
+  before_action :actp
   # GET /accounts
   # GET /accounts.json
   def index
     prevent_tier1_account_creation
-    @accounts = @user.accounts.where.not(tier2_approval: 'deny').or(@user.accounts.where.not(externaluserapproval: 'reject'))
+    @accounts = @user.accounts.all#where.not(tier2_approval: 'deny').or(@user.accounts.where.not(externaluserapproval: 'reject'))
     # @accounts = Account.all
   end
 
@@ -40,6 +40,10 @@ class AccountsController < ApplicationController
   # GET /accounts/new
   def new
     @account = @user.accounts.new
+    actp
+  end
+
+  def actp
     if @user.organization?
       @account_types = ['Checking']
       @acc_counter = 1
@@ -53,7 +57,6 @@ class AccountsController < ApplicationController
       @acc_counter = @acc_counter - 1
     end
   end
-
   # GET /accounts/1/edit
   def edit
   end
