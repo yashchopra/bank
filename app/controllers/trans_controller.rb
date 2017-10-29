@@ -2,7 +2,7 @@ class TransController < ApplicationController
   before_action :authenticate_user!
   before_action :set_tran, only: [:show, :edit, :update, :destroy]
   before_action :set_account
-  #before_action :trans_type_checker
+  before_action :trans_type_checker
 
   # GET /trans
   # GET /trans.json
@@ -27,7 +27,6 @@ class TransController < ApplicationController
   def new
     # @tran = Tran.new
     @tran = @account.trans.new
-    trans_type_checker
   end
 
   ``
@@ -38,6 +37,7 @@ class TransController < ApplicationController
   # POST /trans
   # POST /trans.json
   def create
+    trans_type_checker
     @tran = @account.trans.create(tran_params)
 
     respond_to do |format|
@@ -112,6 +112,7 @@ class TransController < ApplicationController
   end
 
   def check_credit_conditions
+    trans_type_checker
     # This query is used to find the account balance
     #last_transaction = Tran.where.not(balance: nil).last
     #@tran[:balance] = last_transaction[:balance] +  @tran[:amount]
@@ -140,6 +141,7 @@ class TransController < ApplicationController
 
   end
   def check_debit_conditions
+    trans_type_checker
     # This query is used to find the account balance
     # last_transaction = Tran.where.not(balance: nil).last
     # @tran[:balance] = last_transaction[:balance] - @tran[:amount]
@@ -342,10 +344,11 @@ class TransController < ApplicationController
   end
 
   def trans_type_checker
-    at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
-    if at_checker == "Credit Card"
+    @tran = @account.trans.new
+    @at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
+    if @at_checker == "Credit Card"
       @trans_types = ['pay', 'spend']
-    elsif at_checker == "Checking" or at_checker == "Savings"
+    elsif @at_checker == "Checking" or @at_checker == "Savings"
       @trans_types = ['credit', 'debit', 'transfer', 'request']
     else
       @trans_types = ['Not enough Balance']
