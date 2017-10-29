@@ -1,5 +1,6 @@
 class AccountsController < ApplicationController
   before_action :authenticate_user!
+  before_action :verify_userapproval
   before_action :set_account, only: [:show, :edit, :update, :destroy]
   before_action :set_user
 
@@ -166,5 +167,11 @@ class AccountsController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def account_params
     params.require(:account).permit(:acctype, :accnumber, :accrouting, :user_id)
+  end
+
+  def verify_userapproval
+     if @user.tier2_approval != 'deny' || @user.externaluserapproval != 'reject'
+       redirect_to approval_screen and return
+     end
   end
 end

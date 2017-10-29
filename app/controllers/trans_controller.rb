@@ -27,6 +27,7 @@ class TransController < ApplicationController
   def new
     # @tran = Tran.new
     @tran = @account.trans.new
+
   end
 
   ``
@@ -70,15 +71,15 @@ class TransController < ApplicationController
 
   # DELETE /trans/1
   # DELETE /trans/1.json
-  def destroy
-    if not current_user.customer?
-      @tran.destroy
-      respond_to do |format|
-        format.html {redirect_to user_account_path(@user, @account), notice: 'Account was successfully destroyed.'}
-        format.json {head :no_content}
-      end
-    end
-  end
+  # def destroy
+  #   if not current_user.customer?
+  #     @tran.destroy
+  #     respond_to do |format|
+  #       format.html {redirect_to user_account_path(@user, @account), notice: 'Account was successfully destroyed.'}
+  #       format.json {head :no_content}
+  #     end
+  #   end
+  # end
 
   private
   # Use callbacks to share common setup or constraints between actions.
@@ -344,6 +345,10 @@ class TransController < ApplicationController
   end
 
   def trans_type_checker
+    if !@tran.nil?
+    at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
+    end
+    if at_checker == "Credit Card"
     @tran = @account.trans.new
     @at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
     if @at_checker == "Credit Card"
@@ -373,4 +378,5 @@ class TransController < ApplicationController
   def tran_params
     params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status, :isEligibleForTier1, :isCritical)
   end
-end
+  end
+  end
