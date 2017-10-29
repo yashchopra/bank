@@ -378,4 +378,5 @@ class TransController < ApplicationController
   def tran_params
     params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status, :isEligibleForTier1, :isCritical)
   end
-end
+  end
+  end
