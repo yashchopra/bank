@@ -27,6 +27,7 @@ class TransController < ApplicationController
   def new
     # @tran = Tran.new
     @tran = @account.trans.new
+
   end
 
   ``
@@ -344,6 +345,10 @@ class TransController < ApplicationController
   end
 
   def trans_type_checker
+    if !@tran.nil?
+    at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
+    end
+    if at_checker == "Credit Card"
     @tran = @account.trans.new
     @at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
     if @at_checker == "Credit Card"
