@@ -23,7 +23,7 @@ class UserPolicy
 		@current_user.admin? || @current_user.tier1? || @current_user.tier2?
 	end
 
-	def approval_screen
+	def approval_screen?
 		@current_user == @user && (@current_user.customer? || @current_user.organization || 	@current_user.admin? || @current_user.tier2?)
 	end
 

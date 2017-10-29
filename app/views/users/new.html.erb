@@ -1,9 +1,30 @@
 <script>
     $(document).ready(function () {
         $('select').material_select();
+
+
     });
 
 </script>
+
+<script>
+    var onloadCallback = function() {
+        // Renders the HTML element with id 'example1' as a reCAPTCHA widget.
+        // The id of the reCAPTCHA widget is assigned to 'widgetId1'.
+        debugger;
+        var recaptcha_elements = $('.recaptcha');
+        var widgetId2;
+        for(var i=0;i<recaptcha_elements.length;i++){
+            widgetId2 = grecaptcha.render(recaptcha_elements[i], {
+                'sitekey' : "<%= Recaptcha.configuration.site_key %>"
+            });
+        }
+
+    };
+</script>
+
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
+
 
 <div class="container">
   <div class="row">
@@ -50,7 +71,7 @@
           <div class="row">
             <div class="input-field col s6">
               <%= f.label :role %><br/>
-              <%= f.select(:role, @int_users_list) %>
+              <%= f.select(:role, @int_users_list)  if  @int_users_list%>
             </div>
           </div>
 
@@ -112,7 +133,7 @@
             </div>
           </div>
 
-          <%= recaptcha_tags %>
+          <div class="recaptcha"></div>
           <div class="btn waves-effect waves-light" type="submit" name="action">
             <%= f.submit "Sign up" %>
           </div>
