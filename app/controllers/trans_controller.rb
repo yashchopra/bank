@@ -2,6 +2,7 @@ class TransController < ApplicationController
   before_action :authenticate_user!
   before_action :set_tran, only: [:show, :edit, :update, :destroy]
   before_action :set_account
+  before_action :trans_type_checker
 
   # GET /trans
   # GET /trans.json
@@ -26,7 +27,7 @@ class TransController < ApplicationController
   def new
     # @tran = Tran.new
     @tran = @account.trans.new
-    trans_type_checker
+
   end
 
   ``
