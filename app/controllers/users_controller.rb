@@ -1,7 +1,17 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
+  before_action :set_int_user
   after_action :verify_authorized, except: [:home]
 
+  def set_int_user
+    if current_user.role == 'admin'
+      @int_users_list = ['admin', 'tier1', 'tier2']
+    elsif current_user.role == 'tier1'
+      @int_users_list = ['customer', 'organization']
+    else
+      @int_users_list = []
+    end
+  end
 
   def home
     if current_user.role == 'admin' or current_user.role == 'tier2' or current_user.role == 'tier1'
@@ -48,26 +58,11 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     authorize @user
-    if current_user.role == 'admin'
-      @int_users_list = ['admin', 'tier1', 'tier2']
-    elsif current_user.role == 'tier1'
-      @int_users_list = ['customer', 'organization']
-    else
-      @int_users_list = []
-    end
-
   end
 
   def create
     @user = User.new(user_params)
     authorize current_user
-    if current_user.role == 'admin'
-      @int_users_list = ['admin', 'tier1', 'tier2']
-    elsif current_user.role == 'tier1'
-      @int_users_list = ['customer', 'organization']
-    else
-      @int_users_list = []
-    end
     respond_to do |format|
       if verify_recaptcha(model: @user) && @user.save
       # if @user.save
@@ -114,13 +109,7 @@ class UsersController < ApplicationController
   end
 
   def correct_user_list
-    if current_user.role == 'admin'
-      @int_users_list = ['admin', 'tier1', 'tier2']
-    elsif current_user.role == 'tier1'
-      @int_users_list = ['customer', 'organization']
-    else
-      @int_users_list = []
-    end
+
     if current_user.role == 'admin'
       @users = User.where(role: ["admin", "tier1", "tier2"])
     elsif current_user.role == 'tier1'
