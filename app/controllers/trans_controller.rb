@@ -27,7 +27,7 @@ class TransController < ApplicationController
   def new
     # @tran = Tran.new
     @tran = @account.trans.new
-
+    trans_type_checker
   end
 
   ``
