@@ -48,7 +48,13 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     authorize @user
-    @int_users_list = ['admin', 'tier1', 'tier2']
+    if current_user.role == 'admin'
+      @int_users_list = ['admin', 'tier1', 'tier2']
+    elsif current_user.role == 'tier1'
+      @int_users_list = ['customer', 'organization']
+    else
+      @int_users_list = []
+    end
 
   end
 
@@ -102,7 +108,13 @@ class UsersController < ApplicationController
   end
 
   def correct_user_list
-    @int_users_list = ['admin', 'tier1', 'tier2']
+    if current_user.role == 'admin'
+      @int_users_list = ['admin', 'tier1', 'tier2']
+    elsif current_user.role == 'tier1'
+      @int_users_list = ['customer', 'organization']
+    else
+      @int_users_list = []
+    end
     if current_user.role == 'admin'
       @users = User.where(role: ["admin", "tier1", "tier2"])
     elsif current_user.role == 'tier1'
