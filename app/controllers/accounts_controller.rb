@@ -7,7 +7,7 @@ class AccountsController < ApplicationController
   # GET /accounts.json
   def index
     prevent_tier1_account_creation
-    @accounts = @user.accounts.all
+    @accounts = @user.accounts.where.not(tier2_approval: 'deny').or(@user.accounts.where.not(externaluserapproval: 'reject'))
     # @accounts = Account.all
   end
 
@@ -67,6 +67,7 @@ class AccountsController < ApplicationController
       if @account.save
         format.html {redirect_to user_account_path(current_user, @account), notice: 'Account was successfully created.'}
         format.json {render :show, status: :created, location: @account}
+        add_create_condition
       else
         format.html {render :new}
         format.json {render json: @account.errors, status: :unprocessable_entity}
@@ -105,6 +106,22 @@ class AccountsController < ApplicationController
   # Use callbacks to share common setup or constraints between actions.
   def set_account
     @account = Account.find(params[:id])
+  end
+
+  def approvalscreen
+    @user = current_user
+    if @user.tier2?
+      @account = Account.where(tier2_approval: 'deny')
+    elsif @user.customer? || @user.organization?
+      @account = @user.accounts.where(tier2_approval: 'deny').or(@user.accounts.where(externaluserapproval: 'reject'))
+    end
+    @user
+  end
+
+  def add_create_condition
+    if current_user.tier1?
+      @account.update_attributes(:tier2_approval => 'deny', :externaluserapproval => 'reject')
+    end
   end
 
   def set_user

@@ -1,26 +1,33 @@
 <script>
-    $(document).ready(function() {
+    $(document).ready(function () {
         $('select').material_select();
     });
 
-    $(document).ready(function(){
+    $(document).ready(function () {
         $('.collapsible').collapsible();
     });
 </script>
+<div class="container">
+  <div class="row">
+    <div class="col m8 offset-m3">
+      <h5 class="black-text">Approve Users</h5>
+      <% @user.each do |user| %>
+          <%= form_for(user) do |f| %>
+
+              <% if current_user.customer? || current_user.organization? %>
+                  <span> User approving account:</span>
+                  <%= f.select(:externaluserapproval, User.externaluserapprovals.keys.map {|externaluserapproval| [externaluserapproval.titleize, externaluserapproval]}) %>
+              <% else %>
+                  <span> Tier2/Admin approving account:</span>
+                  <%= f.select(:tier2_approval, User.tier2_approvals.keys.map {|tier2_approval| [tier2_approval.titleize, tier2_approval]}) %>
+              <% end %>
 
 
-<%= form_for(@user) do |f| %>
-
-    <% if current_user.customer? || current_user.organization? %>
-        <span> User approving account:</span>
-        <%= f.select(:externaluserapproval,  User.externaluserapprovals.keys.map {|externaluserapproval| [externaluserapproval.titleize, externaluserapproval]}) %>
-    <% else %>
-        <span> Tier2/Admin approving account:</span>
-        <%= f.select(:tier2_approval, User.tier2_approval.keys.map {|tier2_approval| [tier2_approval.titleize, tier2_approval]}) %>
-    <% end %>
-
-
-    <div class="btn waves-effect waves-light" type="submit" name="action">
-      <%= f.submit 'Update info' %>
+              <div class="btn waves-effect waves-light" type="submit" name="action">
+                <%= f.submit 'Update info' %>
+              </div>
+          <% end %>
+      <% end %>
     </div>
-<% end %>
+  </div>
+</div>
