@@ -8,7 +8,7 @@ class UsersController < ApplicationController
       redirect_to users_url and return
     elsif current_user.role == 'customer' or current_user.role == 'organization'
       if current_user.tier2_approval == 'deny' or current_user.externaluserapproval == 'reject'
-        approval_screen
+        redirect_to approval_screen and return
       else
         redirect_to user_accounts_path(@current_user) and return
       end
@@ -18,7 +18,7 @@ class UsersController < ApplicationController
   def approval_screen
     authorize current_user
     if current_user.admin?
-      @user = User.where(role: "admin").or(User.where(role:"tier1")).or(User.where(role:"tier2")).and(User.where (tier2_approval: 'deny'))
+      @user = User.where(role: "admin").or(User.where(role:'tier1')).or(User.where(role:"tier2")).and(User.where(tier2_approval: 'deny'))
     elsif current_user.tier2?
       @user = User.where(tier2_approval: 'deny')
     elsif current_user.customer? || current_user.organization?
