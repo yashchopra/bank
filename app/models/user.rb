@@ -27,6 +27,10 @@ class User < ApplicationRecord
 	# 					:numericality => true,
 	# 					:length => { :minimum => 10, :maximum => 10 }
 
+	# validates :ssn,:presence => true,
+	#  					:numericality => true,
+	#  					:length => { :minimum => 9, :maximum => 9 }
+
 
 	def set_default_role  
 		self.role ||= :customer
