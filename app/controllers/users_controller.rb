@@ -1,29 +1,30 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
-  after_action :verify_authorized, except: [:home]
+  after_action :verify_authorized, except: [:home, :approvalscreen]
 
 
   def home
-    if current_user.role == 'admin' or current_user.role == 'tier2' or current_user.role == 'tier1'
+    if current_user.admin? or current_user.tier2? or current_user.tier1?
       redirect_to users_url and return
-    elsif current_user.role == 'customer' or current_user.role == 'organization'
+    elsif current_user.customer? or current_user.organization?
       if current_user.tier2_approval == 'deny' or current_user.externaluserapproval == 'reject'
-        approval_screen
+        redirect_to approvalscreen_url(current_user) and return
       else
         redirect_to user_accounts_path(@current_user) and return
       end
     end
   end
 
-  def approval_screen
-    authorize current_user
-    if current_user.admin?
-      @user = User.where(role: "admin").or(User.where(role:"tier1")).or(User.where(role:"tier2")).and(User.where (tier2_approval: 'deny'))
-    elsif current_user.tier2?
+  def approvalscreen
+    @user = current_user
+    if @user.admin?
+      @user = User.where(role: "admin").or(User.where(role:'tier1')).or(User.where(role:"tier2")).and(User.where(tier2_approval: 'deny'))
+    elsif @user.tier2?
       @user = User.where(tier2_approval: 'deny')
-    elsif current_user.customer? || current_user.organization?
+    elsif @user.customer? || @user.organization?
       @user = current_user
     end
+    @user
   end
 
   def index
@@ -48,16 +49,29 @@ class UsersController < ApplicationController
   def new
     @user = User.new
     authorize @user
+    if current_user.role == 'admin'
+      @int_users_list = ['admin', 'tier1', 'tier2']
+    elsif current_user.role == 'tier1'
+      @int_users_list = ['customer', 'organization']
+    else
+      @int_users_list = []
+    end
 
   end
 
   def create
     @user = User.new(user_params)
     authorize current_user
-
+    if current_user.role == 'admin'
+      @int_users_list = ['admin', 'tier1', 'tier2']
+    elsif current_user.role == 'tier1'
+      @int_users_list = ['customer', 'organization']
+    else
+      @int_users_list = []
+    end
     respond_to do |format|
-      if verify_recaptcha(model: @user) && @user.save
-      # if @user.save
+      # if verify_recaptcha(model: @user) && @user.save
+      if @user.save
         format.html {redirect_to users_url, notice: 'Tran was successfully created.'}
         format.json {render :show, status: :created, location: @tran_mod}
         set_default_status
@@ -73,8 +87,8 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     authorize @user
 
-    if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
-    # if @user.update_attributes(user_params)
+    # if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
+    if @user.update_attributes(user_params)
       updated_user_params = user_params
       do_update_calculations
       redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
@@ -101,7 +115,13 @@ class UsersController < ApplicationController
   end
 
   def correct_user_list
-    @users_list = ['admin', 'tier1', 'tier2']
+    if current_user.role == 'admin'
+      @int_users_list = ['admin', 'tier1', 'tier2']
+    elsif current_user.role == 'tier1'
+      @int_users_list = ['customer', 'organization']
+    else
+      @int_users_list = []
+    end
     if current_user.role == 'admin'
       @users = User.where(role: ["admin", "tier1", "tier2"])
     elsif current_user.role == 'tier1'
@@ -150,7 +170,7 @@ class UsersController < ApplicationController
   end
 
   def set_default_status
-    if current_user.tier?
+    if current_user.tier1?
       @user.update_attributes(:tier2_approval => 'deny', :externaluserapproval => 'reject')
     end
   end

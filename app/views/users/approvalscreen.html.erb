@@ -1,0 +1,26 @@
+<script>
+    $(document).ready(function() {
+        $('select').material_select();
+    });
+
+    $(document).ready(function(){
+        $('.collapsible').collapsible();
+    });
+</script>
+
+
+<%= form_for(@user) do |f| %>
+
+    <% if current_user.customer? || current_user.organization? %>
+        <span> User approving account:</span>
+        <%= f.select(:externaluserapproval,  User.externaluserapprovals.keys.map {|externaluserapproval| [externaluserapproval.titleize, externaluserapproval]}) %>
+    <% else %>
+        <span> Tier2/Admin approving account:</span>
+        <%= f.select(:tier2_approval, User.tier2_approval.keys.map {|tier2_approval| [tier2_approval.titleize, tier2_approval]}) %>
+    <% end %>
+
+
+    <div class="btn waves-effect waves-light" type="submit" name="action">
+      <%= f.submit 'Update info' %>
+    </div>
+<% end %>

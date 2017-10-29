@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171023025307) do
+ActiveRecord::Schema.define(version: 20171028232022) do
 
   create_table "accounts", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
     t.string "acctype"
@@ -19,6 +19,7 @@ ActiveRecord::Schema.define(version: 20171023025307) do
     t.integer "user_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "statement_balance"
   end
 
   create_table "trans", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -33,6 +34,7 @@ ActiveRecord::Schema.define(version: 20171023025307) do
     t.integer "status"
     t.integer "isCritical"
     t.integer "isEligibleForTier1"
+    t.integer "monthly_payment"
   end
 
   create_table "users", force: :cascade, options: "ENGINE=InnoDB DEFAULT CHARSET=utf8" do |t|
@@ -74,6 +76,10 @@ ActiveRecord::Schema.define(version: 20171023025307) do
     t.string "ssn"
     t.string "ssn_hash"
     t.string "ssn_ciphertext"
+    t.integer "isCritical"
+    t.integer "isEligibleForTier1"
+    t.integer "tier2_approval"
+    t.integer "externaluserapproval"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["encrypted_otp_secret_key"], name: "index_users_on_encrypted_otp_secret_key", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true

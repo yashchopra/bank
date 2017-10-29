@@ -1,7 +1,0 @@
-<% if current_user.customer? || current_user.organization? %>
-    <span> User approving account:</span>
-    <%= f.select :externaluserapproval, User.externaluserapproval.keys.map {|externaluserapproval| [externaluserapproval.titleize, externaluserapproval]}, class: 'input-field col s12' %>
-<% else %>
-    <span> Tier2/Admin approving account:</span>
-    <%= f.select :tier2_approval, User.tier2_approval.keys.map {|tier2_approval| [tier2_approval.titleize, tier2_approval]}, class: 'input-field col s12' %>
-<% end %>
