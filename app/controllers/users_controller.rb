@@ -61,7 +61,13 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     authorize current_user
-
+    if current_user.role == 'admin'
+      @int_users_list = ['admin', 'tier1', 'tier2']
+    elsif current_user.role == 'tier1'
+      @int_users_list = ['customer', 'organization']
+    else
+      @int_users_list = []
+    end
     respond_to do |format|
       if verify_recaptcha(model: @user) && @user.save
       # if @user.save
@@ -163,7 +169,7 @@ class UsersController < ApplicationController
   end
 
   def set_default_status
-    if current_user.tier?
+    if current_user.tier1?
       @user.update_attributes(:tier2_approval => 'deny', :externaluserapproval => 'reject')
     end
   end
