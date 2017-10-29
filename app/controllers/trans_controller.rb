@@ -112,7 +112,7 @@ class TransController < ApplicationController
   end
 
   def check_credit_conditions
-    trans_type_checker
+
     # This query is used to find the account balance
     #last_transaction = Tran.where.not(balance: nil).last
     #@tran[:balance] = last_transaction[:balance] +  @tran[:amount]
@@ -141,7 +141,7 @@ class TransController < ApplicationController
 
   end
   def check_debit_conditions
-    trans_type_checker
+
     # This query is used to find the account balance
     # last_transaction = Tran.where.not(balance: nil).last
     # @tran[:balance] = last_transaction[:balance] - @tran[:amount]
