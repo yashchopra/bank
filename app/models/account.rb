@@ -5,6 +5,8 @@ class Account < ApplicationRecord
   before_save :set_account_number
   validate :number_of_accounts
   validate :all_the_inputs
+  enum externaluserapproval: [:wait ,:accept, :reject]
+  enum tier2_approval: [:impending,  :allow, :deny ]
 
   private
 
