@@ -1,3 +1,6 @@
+<div class="container">
+  <div class="row">
+    <div class="col m8 offset-m3">
 <h5>Hi, you received a code by email, please enter it below, thanks!</h5>
 
 <%= form_tag([resource_name, :two_factor_authentication], :method => :put) do %>
@@ -6,3 +9,6 @@
 <% end %>
 
 <%= link_to "Sign out", destroy_user_session_path, :method => :delete %>
+    </div>
+  </div>
+</div>
