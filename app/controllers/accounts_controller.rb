@@ -1,32 +1,34 @@
 class AccountsController < ApplicationController
   before_action :authenticate_user!
-  before_action :verify_userapproval
+  # before_action :verify_userapproval
   before_action :set_account, only: [:show, :edit, :update, :destroy]
   before_action :set_user
   before_action :actp
-  before_action :check_account, only: [:show]
 
   # GET /accounts
   # GET /accounts.json
   def index
     prevent_tier1_account_creation
-    @accounts = @user.accounts.all#where.not(tier2_approval: 'deny').or(@user.accounts.where.not(externaluserapproval: 'reject'))
+    @accounts = @user.accounts.all #where.not(tier2_approval: 'deny').or(@user.accounts.where.not(externaluserapproval: 'reject'))
     # @accounts = Account.all
   end
 
   # GET /accounts/1
   # GET /accounts/1.json
   def show
-    @trans = @account.trans.all
-    respond_to do |format|
-      format.pdf do
-        render :pdf => 'Account_Statement',
-               :disposition => 'attachment',
-               :template => "accounts/show.pdf.erb"
+    if @account[:externaluserapproval] == 'wait' or @account[:tier2_approval] == 'impending'
+      redirect_to accountapprovalscreen_url(current_user, @account) and return
+    else
+      @trans = @account.trans.all
+      respond_to do |format|
+        format.pdf do
+          render :pdf => 'Account_Statement',
+                 :disposition => 'attachment',
+                 :template => "accounts/show.pdf.erb"
 
+        end
+        format.html
       end
-
-      format.html
     end
   end
 
@@ -59,6 +61,7 @@ class AccountsController < ApplicationController
       @acc_counter = @acc_counter - 1
     end
   end
+
   # GET /accounts/1/edit
   def edit
   end
@@ -114,19 +117,19 @@ class AccountsController < ApplicationController
     @account = Account.find(params[:id])
   end
 
-  def approvalscreen
-    @user = current_user
-    if @user.tier2?
-      @account = Account.where(tier2_approval: 'deny')
-    elsif @user.customer? || @user.organization?
-      @account = @user.accounts.where(tier2_approval: 'deny').or(@user.accounts.where(externaluserapproval: 'reject'))
-    end
-    @user
-  end
+  # def approvalscreen
+  #   @user = current_user
+  #   if @user.tier2?
+  #     @account = Account.where(tier2_approval: 'deny')
+  #   elsif @user.customer? || @user.organization?
+  #     @account = @user.accounts.where(tier2_approval: 'deny').or(@user.accounts.where(externaluserapproval: 'reject'))
+  #   end
+  #   @user
+  # end
 
-  def account_approvalscreen
-    @account
-  end
+  # def accountapprovalscreen
+  #   @account
+  # end
 
   def add_create_condition
     if current_user.tier1?
@@ -167,12 +170,6 @@ class AccountsController < ApplicationController
     end
   end
 
-  def check_account
-    if @account[:externaluserapproval] == 'wait' or @account[:tier2_approval] == 'impending'
-      redirect_to approvalscreen_url and return
-    end
-  end
-
   def prevent_tier1_account_creation
     if current_user == @user && (current_user.tier1? || current_user.tier2?)
       redirect_to users_url and return
@@ -184,9 +181,9 @@ class AccountsController < ApplicationController
     params.require(:account).permit(:acctype, :accnumber, :accrouting, :user_id)
   end
 
-  def verify_userapproval
-     if @user.tier2_approval != 'deny' || @user.externaluserapproval != 'reject'
-       redirect_to approval_screen and return
-     end
-  end
+  # def verify_userapproval
+  #    if @usertier2_approval != 'deny' || @user.externaluserapproval != 'reject'
+  #      redirect_to approval_screen and return
+  #    end
+  # end
 end
