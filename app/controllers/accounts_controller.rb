@@ -4,6 +4,8 @@ class AccountsController < ApplicationController
   before_action :set_account, only: [:show, :edit, :update, :destroy]
   before_action :set_user
   before_action :actp
+  before_action :check_account, only: [:show]
+
   # GET /accounts
   # GET /accounts.json
   def index
@@ -69,7 +71,7 @@ class AccountsController < ApplicationController
 
     respond_to do |format|
       if @account.save
-        format.html {redirect_to user_account_path(current_user, @account), notice: 'Account was successfully created.'}
+        format.html {redirect_to user_accounts_path(@user), notice: 'Account was successfully created.'}
         format.json {render :show, status: :created, location: @account}
         add_create_condition
       else
@@ -122,9 +124,13 @@ class AccountsController < ApplicationController
     @user
   end
 
+  def account_approvalscreen
+    @account
+  end
+
   def add_create_condition
     if current_user.tier1?
-      @account.update_attributes(:tier2_approval => 'deny', :externaluserapproval => 'reject')
+      @account.update_attributes(:tier2_approval => 'impending', :externaluserapproval => 'wait')
     end
   end
 
@@ -158,6 +164,12 @@ class AccountsController < ApplicationController
                   :created_at => DateTime,
                   :updated_at => DateTime,
                   :transfer_account => 'Initial Amount')
+    end
+  end
+
+  def check_account
+    if @account[:externaluserapproval] == 'wait' or @account[:tier2_approval] == 'impending'
+      redirect_to approvalscreen_url and return
     end
   end
 

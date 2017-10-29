@@ -65,14 +65,15 @@ class UsersController < ApplicationController
     authorize current_user
     respond_to do |format|
       @user = set_default_status
-      if verify_recaptcha(model: @user) && @user.save
-      # if @user.save
-        format.html {redirect_to users_url, notice: 'Tran was successfully created.'}
-        format.json {render :show, status: :created, location: @tran_mod}
+      # if verify_recaptcha(model: @user) && @user.save
+      if @user.save
+        format.html {redirect_to users_url, notice: 'Account was successfully created.'}
+        format.json {render :show, status: :created, location: @user}
       else
         format.html {render :new}
-        format.json {render json: @tran_mod.errors, status: :unprocessable_entity}
+        format.json {render json: @user.errors, status: :unprocessable_entity}
       end
+      # set_status
     end
   end
 
@@ -164,10 +165,16 @@ class UsersController < ApplicationController
 
   def set_default_status
     if current_user.tier1?
-      @user[:tier2_approval] = 'impending'
-      @user[:externaluserapproval] = 'wait'
+      @user[:tier2_approval] = "impending"
+      @user[:externaluserapproval] = "wait"
     end
     @user
+  end
+
+  def set_status
+    if current_user.tier1?
+      @user.update_attributes(tier2_approval: 'impending')
+    end
   end
 
   def check_status_function

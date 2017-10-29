@@ -8,8 +8,6 @@ class User < ApplicationRecord
 	enum status: [:pending, :approve, :decline]
 	after_initialize :set_default_role, :if => :new_record?
 	enum isEligibleForTier1: [:yes, :no]
-	enum externaluserapproval: [:wait, :accept, :reject]
-	enum tier2_approval: [:impending, :allow, :deny ]
 	# before_save :user_status
 
   encrypt :ssn, searchable: true, hash_salt: ENV["SECRET_KEY_BASE"], key: ENV["SECRET_KEY_BASE"]
