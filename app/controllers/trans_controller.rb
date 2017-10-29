@@ -10,7 +10,7 @@ class TransController < ApplicationController
       @trans = Tran.where(status: 'pending', isEligibleForTier1: 'yes')
       @user = User.where(role: 'customer').or(User.where(role: 'organization'))
     elsif current_user.tier2?
-      @trans = Tran.find_all(status: 'pending')
+      @trans = Tran.where(status: 'pending')
       @user = User.where(role: 'customer').or(User.where(role: 'organization'))
     else
       user_not_authorized and return
@@ -86,12 +86,12 @@ class TransController < ApplicationController
   end
 
   def set_account
-    if current_user.admin? or current_user.tier2?
+    if current_user.admin?
       redirect_to users_url
     elsif current_user.customer? or current_user.organization?
       @account = Account.find(params[:account_id])
       @user = current_user
-    elsif current_user.tier1?
+    elsif current_user.tier1? or current_user.tier2?
       @account = Account.find(params[:account_id]) if params[:account_id].scan(/\D/).empty?
       @user = current_user
     end
@@ -248,7 +248,7 @@ class TransController < ApplicationController
                   :transfer_account => @tran[:account_id])
       Tran.find_by(id: @tran[:id]).delete
     elsif tran_params[:status] == 'decline'
-      @tran.update_attributes(:explanation => 'Your transaction was declined')
+      # @tran.update_attributes(:explanation => 'Your transaction was declined')
     end
   end
 

@@ -7,7 +7,22 @@ class UsersController < ApplicationController
     if current_user.role == 'admin' or current_user.role == 'tier2' or current_user.role == 'tier1'
       redirect_to users_url and return
     elsif current_user.role == 'customer' or current_user.role == 'organization'
-      redirect_to user_accounts_path(@current_user) and return
+      if current_user.tier2_approval == 'deny' or current_user.externaluserapproval == 'reject'
+        approval_screen
+      else
+        redirect_to user_accounts_path(@current_user) and return
+      end
+    end
+  end
+
+  def approval_screen
+    authorize current_user
+    if current_user.admin?
+      @user = User.where(role: "admin").or(User.where(role:"tier1")).or(User.where(role:"tier2")).and(User.where (tier2_approval: 'deny'))
+    elsif current_user.tier2?
+      @user = User.where(tier2_approval: 'deny')
+    elsif current_user.customer? || current_user.organization?
+      @user = current_user
     end
   end
 
@@ -43,8 +58,10 @@ class UsersController < ApplicationController
 
     respond_to do |format|
       if verify_recaptcha(model: @user) && @user.save
+      # if @user.save
         format.html {redirect_to users_url, notice: 'Tran was successfully created.'}
         format.json {render :show, status: :created, location: @tran_mod}
+        set_default_status
       else
         format.html {render :new}
         format.json {render json: @tran_mod.errors, status: :unprocessable_entity}
@@ -58,6 +75,7 @@ class UsersController < ApplicationController
     authorize @user
 
     if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
+    # if @user.update_attributes(user_params)
       updated_user_params = user_params
       do_update_calculations
       redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
@@ -130,6 +148,12 @@ class UsersController < ApplicationController
       is_critical = true
     end
     is_critical
+  end
+
+  def set_default_status
+    if current_user.tier?
+      @user.update_attributes(:tier2_approval => 'deny', :externaluserapproval => 'reject')
+    end
   end
 
   def check_status_function
