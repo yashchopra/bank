@@ -48,13 +48,13 @@
           <div class="row">
             <div class="input-field col s12">
               <%= f.label :email %><br/>
-              <%= f.email_field :email, autofocus: true %>
+              <%= f.email_field :email, autofocus: true, class: "key" %>
             </div>
           </div>
           <div class="row">
             <div class="input-field col s12">
               <%= f.label :password %>
-              <%= f.password_field :password, autocomplete: "off" %>
+              <%= f.password_field :password, autocomplete: "off", class: "keypswd" %>
               <% if @minimum_password_length %>
                   <span>(<%= @minimum_password_length %> characters minimum) </span>
               <% end %><br/>
@@ -63,7 +63,7 @@
           <div class="row">
             <div class="input-field col s12">
               <%= f.label :password_confirmation %><br/>
-              <%= f.password_field :password_confirmation, autocomplete: "off" %>
+              <%= f.password_field :password_confirmation, autocomplete: "off", class: "keypswd" %>
             </div>
           </div>
 
@@ -78,12 +78,12 @@
           <div class="row">
             <div class="input-field col s6">
               <%= f.label :first_name %><br/>
-              <%= f.text_field :first_name, autofocus: true %>
+              <%= f.text_field :first_name, autofocus: true, class: "key" %>
             </div>
 
             <div class="input-field col s6">
               <%= f.label :last_name %><br/>
-              <%= f.text_field :last_name, autofocus: true %>
+              <%= f.text_field :last_name, autofocus: true, class: "key" %>
             </div>
           </div>
 
@@ -91,45 +91,45 @@
           <div class="row">
             <div class="input-field col s6">
               <%= f.label :phone %><br/>
-              <%= f.text_field :phone, autofocus: true %>
+              <%= f.text_field :phone, autofocus: true, class: "key" %>
             </div>
           </div>
 
           <div class="row">
             <div class="input-field col s12">
               <%= f.label :street %><br/>
-              <%= f.text_field :street, autofocus: true %>
+              <%= f.text_field :street, autofocus: true, class: "key" %>
             </div>
           </div>
 
           <div class="row">
             <div class="input-field col s6">
               <%= f.label :city %><br/>
-              <%= f.text_field :city, autofocus: true %>
+              <%= f.text_field :city, autofocus: true, class: "key" %>
             </div>
 
             <div class="input-field col s6">
               <%= f.label :state %><br/>
-              <%= f.text_field :state, autofocus: true %>
+              <%= f.text_field :state, autofocus: true, class: "key" %>
             </div>
           </div>
 
           <div class="row">
             <div class="input-field col s6">
               <%= f.label :country %><br/>
-              <%= f.text_field :country, autofocus: true %>
+              <%= f.text_field :country, autofocus: true, class: "key" %>
             </div>
 
             <div class="input-field col s6">
               <%= f.label :zip %><br/>
-              <%= f.text_field :zip, autofocus: true %>
+              <%= f.text_field :zip, autofocus: true, class: "key" %>
             </div>
           </div>
 
           <div class="row">
             <div class="input-field col s6">
               <%= f.label :ssn %><br/>
-              <%= f.password_field :ssn, autofocus: true %>
+              <%= f.password_field :ssn, autofocus: true, class: "key" %>
             </div>
           </div>
 
