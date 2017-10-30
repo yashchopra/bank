@@ -8,8 +8,7 @@ class User < ApplicationRecord
 	enum status: [:pending, :approve, :decline]
 	after_initialize :set_default_role, :if => :new_record?
 	enum isEligibleForTier1: [:yes, :no]
-	enum externaluserapproval: [:accept, :reject]
-	enum tier2_approval: [:allow, :deny ]
+	# before_save :user_status
 
   encrypt :ssn, searchable: true, hash_salt: ENV["SECRET_KEY_BASE"], key: ENV["SECRET_KEY_BASE"]
   #
@@ -27,13 +26,24 @@ class User < ApplicationRecord
 	# 					:numericality => true,
 	# 					:length => { :minimum => 10, :maximum => 10 }
 
+	# validates :ssn,:presence => true,
+	#  					:numericality => true,
+	#  					:length => { :minimum => 9, :maximum => 9 }
+
 
 	def set_default_role  
 		self.role ||= :customer
 	end
 
+	# def user_status
+	# 	if current_user.tier1?
+	# 		self.tier2_approval = 'impending'
+	# 		self.tier2_approval = 'wait'
+	# 	end
+	# end
 
-  devise :database_authenticatable, :recoverable, :trackable, :validatable, :two_factor_authenticatable, :lockable, :timeoutable, :password_expirable, :secure_validatable
+
+  devise :database_authenticatable,:session_limitable, :recoverable, :trackable, :validatable, :two_factor_authenticatable, :lockable, :timeoutable, :password_expirable, :secure_validatable
 	has_one_time_password(encrypted: true)
 
 	def send_two_factor_authentication_code(code)

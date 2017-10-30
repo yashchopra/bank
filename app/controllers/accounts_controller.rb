@@ -1,29 +1,34 @@
 class AccountsController < ApplicationController
   before_action :authenticate_user!
+  # before_action :verify_userapproval
   before_action :set_account, only: [:show, :edit, :update, :destroy]
   before_action :set_user
+  before_action :actp
 
   # GET /accounts
   # GET /accounts.json
   def index
     prevent_tier1_account_creation
-    @accounts = @user.accounts.all
+    @accounts = @user.accounts.all #where.not(tier2_approval: 'deny').or(@user.accounts.where.not(externaluserapproval: 'reject'))
     # @accounts = Account.all
   end
 
   # GET /accounts/1
   # GET /accounts/1.json
   def show
-    @trans = @account.trans.all
-    respond_to do |format|
-      format.pdf do
-        render :pdf => 'Account_Statement',
-               :disposition => 'attachment',
-               :template => "accounts/show.pdf.erb"
+    if @account[:externaluserapproval] == 'wait' or @account[:tier2_approval] == 'impending'
+      redirect_to accountapprovalscreen_url(current_user, @account) and return
+    else
+      @trans = @account.trans.all
+      respond_to do |format|
+        format.pdf do
+          render :pdf => 'Account_Statement',
+                 :disposition => 'attachment',
+                 :template => "accounts/show.pdf.erb"
 
+        end
+        format.html
       end
-
-      format.html
     end
   end
 
@@ -39,6 +44,10 @@ class AccountsController < ApplicationController
   # GET /accounts/new
   def new
     @account = @user.accounts.new
+    actp
+  end
+
+  def actp
     if @user.organization?
       @account_types = ['Checking']
       @acc_counter = 1
@@ -65,8 +74,9 @@ class AccountsController < ApplicationController
 
     respond_to do |format|
       if @account.save
-        format.html {redirect_to user_account_path(current_user, @account), notice: 'Account was successfully created.'}
+        format.html {redirect_to user_accounts_path(@user), notice: 'Account was successfully created.'}
         format.json {render :show, status: :created, location: @account}
+        add_create_condition
       else
         format.html {render :new}
         format.json {render json: @account.errors, status: :unprocessable_entity}
@@ -101,10 +111,27 @@ class AccountsController < ApplicationController
     end
   end
 
+
+  def accountapprovalscreen
+    if @user.customer? || @user.organization?
+      @account = Account.where(tier2_approval: 'impending') ||  Account.where(externaluserapproval: 'wait')
+    else
+      @user.tier2?
+      @account = Account.where(tier2_approval: 'impending')
+    end
+  end
+
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_account
     @account = Account.find(params[:id])
+  end
+
+
+  def add_create_condition
+    if current_user.tier1?
+      @account.update_attributes(:tier2_approval => 'impending', :externaluserapproval => 'wait')
+    end
   end
 
   def set_user
@@ -150,4 +177,10 @@ class AccountsController < ApplicationController
   def account_params
     params.require(:account).permit(:acctype, :accnumber, :accrouting, :user_id)
   end
+
+  # def verify_userapproval
+  #    if @usertier2_approval != 'deny' || @user.externaluserapproval != 'reject'
+  #      redirect_to approval_screen and return
+  #    end
+  # end
 end

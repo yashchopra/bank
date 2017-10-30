@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   def set_int_user
     if current_user.role == 'admin'
       @int_users_list = ['admin', 'tier1', 'tier2']
-    elsif current_user.role == 'tier1'
+    elsif current_user.role == 'tier1' or current_user.role == 'tier2'
       @int_users_list = ['customer', 'organization']
     else
       @int_users_list = []
@@ -30,7 +30,7 @@ class UsersController < ApplicationController
     if current_user.admin?
       @user = User.where(role: "admin").or(User.where(role:'tier1')).or(User.where(role:"tier2")).and(User.where(tier2_approval: 'deny'))
     elsif current_user.tier2?
-      @user = User.where(tier2_approval: 'deny')
+      @user = User.where(tier2_approval: 'impending')
     elsif current_user.customer? || current_user.organization?
       @user = current_user
     end
@@ -64,15 +64,16 @@ class UsersController < ApplicationController
     @user = User.new(user_params)
     authorize current_user
     respond_to do |format|
-      if verify_recaptcha(model: @user) && @user.save
-      # if @user.save
-        format.html {redirect_to users_url, notice: 'Tran was successfully created.'}
-        format.json {render :show, status: :created, location: @tran_mod}
-        set_default_status
+      @user = set_default_status
+      # if verify_recaptcha(model: @user) && @user.save
+      if @user.save
+        format.html {redirect_to users_url, notice: 'Account was successfully created.'}
+        format.json {render :show, status: :created, location: @user}
       else
         format.html {render :new}
-        format.json {render json: @tran_mod.errors, status: :unprocessable_entity}
+        format.json {render json: @user.errors, status: :unprocessable_entity}
       end
+      # set_status
     end
   end
 
@@ -105,7 +106,7 @@ class UsersController < ApplicationController
 
 
   def user_params
-    params.require(:user).permit(:role, :email, :password, :password_confirmation, :phone, :first_name, :last_name, :city, :state, :country, :street, :zip, :updated_email, :updated_phone, :status, :ssn)
+    params.require(:user).permit(:role, :email, :password, :password_confirmation, :phone, :first_name, :last_name, :city, :state, :country, :street, :zip, :updated_email, :updated_phone, :status, :ssn, :tier2_approval, :externaluserapproval)
   end
 
   def correct_user_list
@@ -126,6 +127,11 @@ class UsersController < ApplicationController
       check_status_function
     elsif user_params['updated_email'] or user_params['updated_phone']
       @user.update_attributes(:status => 'pending')
+    end
+    if user_params['tier2_approval'] == 'deny' or user_params['externaluserapproval'] == 'reject'
+      redirect_to destroy_user_session_path
+      # sign_out_and_redirect(current_user)
+      # redirect_to signout_path and return
     end
   end
 
@@ -159,7 +165,15 @@ class UsersController < ApplicationController
 
   def set_default_status
     if current_user.tier1?
-      @user.update_attributes(:tier2_approval => 'deny', :externaluserapproval => 'reject')
+      @user[:tier2_approval] = "impending"
+      @user[:externaluserapproval] = "wait"
+    end
+    @user
+  end
+
+  def set_status
+    if current_user.tier1?
+      @user.update_attributes(tier2_approval: 'impending')
     end
   end
 

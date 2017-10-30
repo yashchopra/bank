@@ -2,7 +2,7 @@ class TransController < ApplicationController
   before_action :authenticate_user!
   before_action :set_tran, only: [:show, :edit, :update, :destroy]
   before_action :set_account
-  #before_action :trans_type_checker
+  before_action :trans_type_checker
 
   # GET /trans
   # GET /trans.json
@@ -30,6 +30,20 @@ class TransController < ApplicationController
     trans_type_checker
   end
 
+  def trans_type_checker
+    @tran = @account.trans.new
+    if !@tran.nil?
+      at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
+    end
+      if at_checker == "Credit Card"
+        @trans_types = ['pay', 'spend']
+      elsif at_checker == "Checking" or at_checker == "Savings"
+        @trans_types = ['credit', 'debit', 'transfer', 'request']
+      else
+        @trans_types = ['Not enough Balance']
+      end
+    end
+
   ``
   # GET /trans/1/edit
   # def edit
@@ -38,6 +52,7 @@ class TransController < ApplicationController
   # POST /trans
   # POST /trans.json
   def create
+    trans_type_checker
     @tran = @account.trans.create(tran_params)
 
     respond_to do |format|
@@ -70,15 +85,15 @@ class TransController < ApplicationController
 
   # DELETE /trans/1
   # DELETE /trans/1.json
-  def destroy
-    if not current_user.customer?
-      @tran.destroy
-      respond_to do |format|
-        format.html {redirect_to user_account_path(@user, @account), notice: 'Account was successfully destroyed.'}
-        format.json {head :no_content}
-      end
-    end
-  end
+  # def destroy
+  #   if not current_user.customer?
+  #     @tran.destroy
+  #     respond_to do |format|
+  #       format.html {redirect_to user_account_path(@user, @account), notice: 'Account was successfully destroyed.'}
+  #       format.json {head :no_content}
+  #     end
+  #   end
+  # end
 
   private
   # Use callbacks to share common setup or constraints between actions.
@@ -112,6 +127,7 @@ class TransController < ApplicationController
   end
 
   def check_credit_conditions
+
     # This query is used to find the account balance
     #last_transaction = Tran.where.not(balance: nil).last
     #@tran[:balance] = last_transaction[:balance] +  @tran[:amount]
@@ -140,6 +156,7 @@ class TransController < ApplicationController
 
   end
   def check_debit_conditions
+
     # This query is used to find the account balance
     # last_transaction = Tran.where.not(balance: nil).last
     # @tran[:balance] = last_transaction[:balance] - @tran[:amount]
@@ -341,19 +358,7 @@ class TransController < ApplicationController
     end
   end
 
-  def trans_type_checker
-    at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
-    if at_checker == "Credit Card"
-      @trans_types = ['pay', 'spend']
-    elsif at_checker == "Checking" or at_checker == "Savings"
-      @trans_types = ['credit', 'debit', 'transfer', 'request']
-    else
-      @trans_types = ['Not enough Balance']
-    end
-
-  end
-
-  def find_account
+    def find_account
     if @tran[:transfer_account].include? '@'
       account_user = User.find_by_email(@tran[:transfer_account])
       account_to_transfer = account_user.accounts.find_by(acctype: 'checking')
@@ -369,5 +374,7 @@ class TransController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def tran_params
     params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status, :isEligibleForTier1, :isCritical)
-  end
+    end
 end
+
+
