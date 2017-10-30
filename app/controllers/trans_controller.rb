@@ -27,8 +27,22 @@ class TransController < ApplicationController
   def new
     # @tran = Tran.new
     @tran = @account.trans.new
-
+    trans_type_checker
   end
+
+  def trans_type_checker
+    @tran = @account.trans.new
+    if !@tran.nil?
+      at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
+    end
+      if at_checker == "Credit Card"
+        @trans_types = ['pay', 'spend']
+      elsif at_checker == "Checking" or at_checker == "Savings"
+        @trans_types = ['credit', 'debit', 'transfer', 'request']
+      else
+        @trans_types = ['Not enough Balance']
+      end
+    end
 
   ``
   # GET /trans/1/edit
@@ -344,24 +358,7 @@ class TransController < ApplicationController
     end
   end
 
-  def trans_type_checker
-    if !@tran.nil?
-    at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
-    end
-    if at_checker == "Credit Card"
-    @tran = @account.trans.new
-    @at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
-    if @at_checker == "Credit Card"
-      @trans_types = ['pay', 'spend']
-    elsif @at_checker == "Checking" or @at_checker == "Savings"
-      @trans_types = ['credit', 'debit', 'transfer', 'request']
-    else
-      @trans_types = ['Not enough Balance']
-    end
-
-  end
-
-  def find_account
+    def find_account
     if @tran[:transfer_account].include? '@'
       account_user = User.find_by_email(@tran[:transfer_account])
       account_to_transfer = account_user.accounts.find_by(acctype: 'checking')
@@ -377,6 +374,7 @@ class TransController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def tran_params
     params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status, :isEligibleForTier1, :isCritical)
-  end
-  end
-  end
+    end
+end
+
+
