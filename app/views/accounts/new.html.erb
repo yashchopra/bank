@@ -5,15 +5,20 @@
 
 </script>
 
+<% if @current_user && (@current_user.role == 'tier1' || @current_user.role== 'tier2' || @current_user.role== 'admin') %>
+     <div class="container">
+      <div class="row">
+        <div class="col m8 offset-m2">
+          <h5 class="black-text">New Account</h5>
 
-<div class="container">
-  <div class="row">
-    <div class="col m8 offset-m2">
-      <h5 class="black-text">New Account</h5>
-
-      <%= render 'form', account: @account %>
-      <br>
-      <button class="waves-effect waves-light btn"> <%= link_to 'Back', user_accounts_path %></button>
+          <%= render 'form', account: @account %>
+          <br>
+          <button class="waves-effect waves-light btn"> <%= link_to 'Back', user_accounts_path %></button>
+        </div>
+      </div>
     </div>
+<% else %>
+  <div class="container">
+    <h5>Invalid Request</h5>
   </div>
-</div>
+<% end %>

@@ -32,9 +32,9 @@
       </table>
 
       <br>
-
-      <button class="waves-effect waves-light btn" <%= @acc_counter==0 ? 'disabled' : '' %>> <%= link_to 'Create New Account', new_user_account_path(@user) %> </button>
-
+      <% if @current_user && (@current_user.role == 'tier1' || @current_user.role== 'tier2' || @current_user.role== 'admin') %>
+        <button class="waves-effect waves-light btn" <%= @acc_counter==0 ? 'disabled' : '' %>> <%= link_to 'Create New Account', new_user_account_path(@user) %> </button>
+      <% end %>
     </div>
   </div>
 </div>
