@@ -7,7 +7,7 @@ class Tran < ApplicationRecord
   enum externaluserapproval: [:wait ,:accept, :reject]
   enum tier2_approval: [:impending,  :allow, :deny ]
 
-
+#bizarre
   validates_presence_of :amount
   validate :amount_type
   validate :deductible_amount, :if => :transaction_type_is_transfer_or_debit?
