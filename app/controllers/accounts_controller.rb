@@ -16,6 +16,7 @@ class AccountsController < ApplicationController
   # GET /accounts/1
   # GET /accounts/1.json
   def show
+    @account = Account.find_by_id(params[:id])
     if @account[:externaluserapproval] == 'wait' or @account[:tier2_approval] == 'impending'
       redirect_to accountapprovalscreen_url(current_user, @account) and return
     else
@@ -45,6 +46,15 @@ class AccountsController < ApplicationController
   def new
     @account = @user.accounts.new
     actp
+  end
+
+  def send_otp_to_email
+    account = Account.find_by_id(params[:id])
+    code = account.otp_code
+
+    # account.update_attribute(:otp_secret_key , account.otp_code )
+    email = account.user.email
+    UserMailer.send_trans_otp(email, code).deliver
   end
 
   def actp
@@ -122,7 +132,7 @@ class AccountsController < ApplicationController
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_account
-    @account = Account.find(params[:id])
+      @account = Account.find(params[:id])
   end
 
 

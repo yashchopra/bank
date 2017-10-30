@@ -10,4 +10,10 @@ class UserMailer < ApplicationMailer
     @email = email
     mail(to: @email, subject: 'Your OTP')
   end
+
+  def send_trans_otp(email, code)
+    @code = code
+    @email = email
+    mail(to: @email, subject: 'Your Transaction OTP')
+  end
 end
