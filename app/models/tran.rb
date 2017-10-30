@@ -70,7 +70,7 @@ class Tran < ApplicationRecord
         end
       elsif transfer_account.length == 10
         checking_chck = (User.find_by_phone(transfer_account)).accounts.find_by_acctype('checking')
-        if account_to_transfer == nil
+        if checking_chck == nil
           errors.add(:transfer_account, "Phone transfers can only be done to Checking accounts")
         else
           account_to_transfer = checking_chck.accnumber
