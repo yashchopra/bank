@@ -44,8 +44,10 @@ class AccountsController < ApplicationController
 
   # GET /accounts/new
   def new
-    @account = @user.accounts.new
-    actp
+    if @current_user && (@current_user.role == 'tier1' || @current_user.role== 'tier2' || @current_user.role== 'admin')
+      @account = @user.accounts.new
+      actp
+    end
   end
 
   def send_otp_to_email
@@ -79,6 +81,7 @@ class AccountsController < ApplicationController
   # POST /accounts
   # POST /accounts.json
   def create
+
     @account = @user.accounts.create(account_params)
     # @account = Account.new(account_params)
 
