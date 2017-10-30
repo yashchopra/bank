@@ -6,7 +6,7 @@ class UsersController < ApplicationController
   def set_int_user
     if current_user.role == 'admin'
       @int_users_list = ['admin', 'tier1', 'tier2']
-    elsif current_user.role == 'tier1'
+    elsif current_user.role == 'tier1' or current_user.role == 'tier2'
       @int_users_list = ['customer', 'organization']
     else
       @int_users_list = []
