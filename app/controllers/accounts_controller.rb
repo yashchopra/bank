@@ -115,9 +115,7 @@ class AccountsController < ApplicationController
   def accountapprovalscreen
     if @user.customer? || @user.organization?
       @account = Account.where(tier2_approval: 'impending') ||  Account.where(externaluserapproval: 'wait')
-    else
-      @user.tier2?
-      @account = Account.where(tier2_approval: 'impending')
+      @user = current_user
     end
   end
 

@@ -11,21 +11,27 @@
   <div class="row">
     <div class="col m8 offset-m3">
       <h5 class="black-text">Approve Users</h5>
-      <% @user.each do |user| %>
-          <%= form_for(user) do |f| %>
-
-              <% if current_user.customer? || current_user.organization? %>
-                  <span> User approving account:</span>
-                  <%= f.select(:externaluserapproval, User.externaluserapprovals.keys.map {|externaluserapproval| [externaluserapproval.titleize, externaluserapproval]}) %>
-              <% else %>
+      <% if @user %>
+          <% @user.each do |user| %>
+              <%= form_for(user) do |f| %>
                   <span> Tier2/Admin approving account:</span>
-                  <%= f.select(:tier2_approval, User.tier2_approvals.keys.map {|tier2_approval| [tier2_approval.titleize, tier2_approval]}) %>
+                  <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %>
+                  <div class="btn waves-effect waves-light" type="submit" name="action">
+                    <%= f.submit 'Update info' %>
+                  </div>
               <% end %>
+          <% end %>
+      <% end %>
 
-
-              <div class="btn waves-effect waves-light" type="submit" name="action">
-                <%= f.submit 'Update info' %>
-              </div>
+      <% if @account %>
+          <% @account.each do |account| %>
+              <%= form_for(account) do |f| %>
+                  <span> Tier2/Admin approving account:</span>
+                  <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %>
+                  <div class="btn waves-effect waves-light" type="submit" name="action">
+                    <%= f.submit 'Update info' %>
+                  </div>
+              <% end %>
           <% end %>
       <% end %>
     </div>
