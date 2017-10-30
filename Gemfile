@@ -78,3 +78,5 @@ gem 'devise_security_extension', git: 'https://github.com/phatworx/devise_securi
 gem 'coffee-script-source', '1.8.0'
 gem 'wicked_pdf'
 gem 'wkhtmltopdf-binary'
+
+gem 'active_model_otp'

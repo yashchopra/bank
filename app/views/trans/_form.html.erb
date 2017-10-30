@@ -26,7 +26,34 @@
       <%= form.text_field :transfer_account, id: :tran_transfer_account %>
     </div>
 
-    <div class="btn waves-effect waves-light" type="submit" name="action">
+    <div class="btn waves-effect waves-light" id="send-otp" type="button" name="action">
+      Send OTP
+    </div>
+
+    <div class="field">
+      <%= form.text_field :transaction_otp, id: :transaction_otp %>
+      <%= form.label 'Enter OTP' %>
+    </div>
+
+    <div class="btn waves-effect waves-light disabled" type="submit" name="action" id="create_transaction">
       <%= form.submit %>
     </div>
 <% end %>
+<script>
+
+  <% @account_id = @account[:id] %>
+  <% @url = "/accounts/#{@account[:id]}/sendotp" %>
+
+  $('#send-otp').on("click", function () {
+      $.ajax({
+
+        type: "POST",
+        url:'<%= "#{@url}" %>',
+        complete: function() {
+        }
+      });
+  })
+  $('#transaction_otp').change(function(){
+      $('#create_transaction').removeClass("disabled");
+  })
+</script>

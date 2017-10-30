@@ -53,15 +53,23 @@ class TransController < ApplicationController
   # POST /trans.json
   def create
     trans_type_checker
-    @tran = @account.trans.create(tran_params)
+    if @account.authenticate_otp(tran_params[:transaction_otp],drift: 120)
 
-    respond_to do |format|
-      @tran = do_transaction_specific_calculations
-      if @tran.save
-        format.html {redirect_to user_account_path(@user, @account), notice: 'Tran was successfully created.'}
-        format.json {render :show, status: :created, location: @tran}
-      else
-        format.html {render :new}
+      @tran = @account.trans.create(tran_params)
+      respond_to do |format|
+        @tran = do_transaction_specific_calculations
+        if @tran.save
+          format.html {redirect_to user_account_path(@user, @account), notice: 'Tran was successfully created.'}
+          format.json {render :show, status: :created, location: @tran}
+        else
+          format.html {render :new}
+          format.json {render json: @tran_mod.errors, status: :unprocessable_entity}
+        end
+      end
+    else
+
+      respond_to do |format|
+        format.html {render :new, notice: 'Transaction Unsuccessful!'}
         format.json {render json: @tran_mod.errors, status: :unprocessable_entity}
       end
     end
@@ -373,7 +381,7 @@ class TransController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def tran_params
-    params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status, :isEligibleForTier1, :isCritical)
+    params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status, :isEligibleForTier1, :isCritical, :transaction_otp)
     end
 end
 
