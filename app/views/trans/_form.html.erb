@@ -34,10 +34,12 @@
     <div class="btn waves-effect waves-light" id="send-otp" type="button" name="action">
       Send OTP
     </div>
-
+    <br/>
+    <br/>
+    <br/>
     <div class="field">
-      <%= form.text_field :transaction_otp, id: :transaction_otp %>
       <%= form.label 'Enter OTP' %>
+      <%= form.text_field :transaction_otp, id: :transaction_otp %>
     </div>
 
     <div class="btn waves-effect waves-light disabled" type="submit" name="action" id="create_transaction">
@@ -58,10 +60,10 @@
         }
       });
   })
-  $('#transaction_otp').change(function(){
+  $('#transaction_otp').on('click',function(){
       $('#create_transaction').removeClass("disabled");
   })
-  $('#tran_transfer_account').change(function () {
+  $('#tran_transfer_account').keyup(function () {
       if(this.value.length === 16){
           $('.routingNum').removeClass("hidden");
       }
