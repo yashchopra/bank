@@ -19,7 +19,7 @@ class UsersController < ApplicationController
     if current_user.role == 'admin' or current_user.role == 'tier2' or current_user.role == 'tier1'
       redirect_to users_url and return
     elsif current_user.role == 'customer' or current_user.role == 'organization'
-      if current_user.tier2_approval == 'impending' or current_user.externaluserapproval == 'wait'
+      if current_user.tier2_approval == 0 or current_user.tier2_approval == 'impending' or current_user.externaluserapproval == 0 or current_user.externaluserapproval=='wait'
         redirect_to approvalscreen_user_url(current_user) and return
       else
         redirect_to user_accounts_path(@current_user) and return

@@ -10,6 +10,7 @@ Rails.application.routes.draw do
   get 'users/:id/approvalscreen_user' => "users#approvalscreen_user", as: "approvalscreen_user"
   get 'users/:user_id/accounts/:id/accountapprovalscreen' => "accounts#accountapprovalscreen", as: "accountapprovalscreen"
   get '/signout', to: 'devise/sessions#destroy', as: :signout
+  post 'accounts/:id/sendotp' => "accounts#send_otp_to_email"
 
   resources :accounts do
       resources :trans

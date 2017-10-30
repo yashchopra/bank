@@ -1,4 +1,5 @@
 class Account < ApplicationRecord
+  has_one_time_password
   belongs_to :user
   has_many :trans, dependent: :delete_all
   accepts_nested_attributes_for :trans
@@ -7,6 +8,10 @@ class Account < ApplicationRecord
   validate :all_the_inputs
   enum externaluserapproval: [:wait ,:accept, :reject]
   enum tier2_approval: [:impending,  :allow, :deny ]
+
+  def generateOTP
+    self.otp_code = Account.otp_code
+  end
 
   private
 
