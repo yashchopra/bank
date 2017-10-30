@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_int_user
-  after_action :verify_authorized, except: [:home, :approval_screen]
+  after_action :verify_authorized, except: [:home, :approval_screen, :approvalscreen_user]
 
   def set_int_user
     if current_user.role == 'admin'
@@ -19,8 +19,8 @@ class UsersController < ApplicationController
     if current_user.role == 'admin' or current_user.role == 'tier2' or current_user.role == 'tier1'
       redirect_to users_url and return
     elsif current_user.role == 'customer' or current_user.role == 'organization'
-      if current_user.tier2_approval == 'deny' or current_user.externaluserapproval == 'reject'
-        redirect_to approval_screen and return
+      if current_user.tier2_approval == 'impending' or current_user.externaluserapproval == 'wait'
+        redirect_to approvalscreen_user_url(current_user) and return
       else
         redirect_to user_accounts_path(@current_user) and return
       end
@@ -35,6 +35,10 @@ class UsersController < ApplicationController
       @user = User.where(tier2_approval: 'impending')
       @account = Account.where(tier2_approval: 'impending')
     end
+  end
+
+  def approvalscreen_user
+    @user = current_user
   end
 
   def index
@@ -63,9 +67,10 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     authorize current_user
-    @user = set_default_status
     respond_to do |format|
       @user = set_default_status
+      # @user.tier2_approval = "Y"
+      # @user[:externaluserapproval] = "wait"
       # if verify_recaptcha(model: @user) && @user.save
       if @user.save
         format.html {redirect_to users_url, notice: 'Account was successfully created.'}
@@ -107,7 +112,7 @@ class UsersController < ApplicationController
 
 
   def user_params
-    params.require(:user).permit(:role, :email, :password, :password_confirmation, :phone, :first_name, :last_name, :city, :state, :country, :street, :zip, :updated_email, :updated_phone, :status, :ssn, :tier2_approval, :externaluserapproval)
+    params.require(:user).permit(:role, :email, :password, :password_confirmation, :phone, :first_name, :last_name, :city, :state, :country, :street, :zip, :updated_email, :updated_phone, :status, :ssn)
   end
 
   def correct_user_list

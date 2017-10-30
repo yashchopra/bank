@@ -7,6 +7,7 @@ Rails.application.routes.draw do
 
   get 'users/:id/logs/:lines' => "users#log", as: "log"
   get 'users/:id/approvalscreen' => "users#approvalscreen", as: "approvalscreen"
+  get 'users/:id/approvalscreen_user' => "users#approvalscreen_user", as: "approvalscreen_user"
   get 'users/:user_id/accounts/:id/accountapprovalscreen' => "accounts#accountapprovalscreen", as: "accountapprovalscreen"
   get '/signout', to: 'devise/sessions#destroy', as: :signout
 
