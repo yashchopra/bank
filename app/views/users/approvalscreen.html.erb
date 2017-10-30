@@ -7,27 +7,28 @@
         $('.collapsible').collapsible();
     });
 </script>
-<div class="container">
-  <div class="row">
-    <div class="col m8 offset-m3">
+<div style="width: 100%;overflow:auto;">
+
+  <div style="float:left; width: 35%">
       <h5 class="black-text">Approve Users</h5>
       <% if @user %>
           <% @user.each do |user| %>
               <%= form_for(user) do |f| %>
-                  <span> Tier2/Admin approving account:</span>
-                  <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %>
-                  <div class="btn waves-effect waves-light" type="submit" name="action">
-                    <%= f.submit 'Update info' %>
-                  </div>
-              <% end %>
-          <% end %>
-      <% end %>
+                  <ul class="collapsible" data-collapsible="accordion">
+                    <li>
+                      <div class="collapsible-header">
 
-      <% if @account %>
-          <% @account.each do |account| %>
-              <%= form_for(account) do |f| %>
-                  <span> Tier2/Admin approving account:</span>
-                  <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %>
+                        <span>User Name:
+                          <%= user.first_name %>
+                          <%= user.last_name %>
+                         </span>
+
+                      </div>
+                      <div class="collapsible-body">
+                        <span> <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %> </span>
+                      </div>
+                    </li>
+                  </ul>
                   <div class="btn waves-effect waves-light" type="submit" name="action">
                     <%= f.submit 'Update info' %>
                   </div>
@@ -35,5 +36,33 @@
           <% end %>
       <% end %>
     </div>
+
+
+  <div style="width: 35%; float:left; margin-left:4.25%;">
+      <h5>Approve Accounts</h5>
+      <% if @account %>
+          <% @account.each do |account| %>
+              <%= form_for(account) do |f| %>
+                  <ul class="collapsible" data-collapsible="accordion">
+                    <li>
+                      <div class="collapsible-header">
+                        <span>Account number: <%= Account.find_by_id(tran.account_id)[:accnumber] %> </span>
+                        <span style="margin-left: 30px;">Amount: <%= tran.amount %> </span>
+
+                      </div>
+                      <div class="collapsible-body">
+                        <span> <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %> </span>
+                      </div>
+                    </li>
+                  </ul>
+                  <div class="btn waves-effect waves-light" type="submit" name="action">
+                    <%= f.submit 'Update info' %>
+                  </div>
+              <% end %>
+          <% end %>
+      <% end %>
+    </div>
+
   </div>
-</div>
+    </div>
+
