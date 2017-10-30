@@ -55,13 +55,37 @@ class Tran < ApplicationRecord
   def transfer_account_conditions
 
     account_to_transfer_exist = (Account.exists?(accnumber: transfer_account) or (User.exists?(email: transfer_account)) or (User.exists?(phone: transfer_account)))
-    if !account_to_transfer_exist
-      errors.add(:transfer_account, "Account number / email / Phone number not found.")
-    end
 
     if account_to_transfer_exist && transfer_himself
       errors.add(:transfer_account, "You can not send or recieve money from yourself")
+
+    elsif account_to_transfer_exist && !transfer_himself
+      if transfer_account.include? '@'
+        checking_chck = (User.find_by_email(transfer_account)).accounts.find_by_acctype('checking')
+        if checking_chck == nil
+          errors.add(:transfer_account, "Email transfers can only be done to Checking accounts")
+        else
+          account_to_transfer = checking_chck.accnumber
+          self.transfer_account = account_to_transfer
+        end
+      elsif transfer_account.length == 10
+        checking_chck = (User.find_by_phone(transfer_account)).accounts.find_by_acctype('checking')
+        if account_to_transfer == nil
+          errors.add(:transfer_account, "Phone transfers can only be done to Checking accounts")
+        else
+          account_to_transfer = checking_chck.accnumber
+          self.transfer_account = account_to_transfer
+        end
+      elsif transfer_account.length == 12
+        account_to_transfer = transfer_account
+        self.transfer_account = account_to_transfer
+      end
+
+    elsif !account_to_transfer_exist
+      errors.add(:transfer_account, "Account number / email / Phone number not found.")
     end
+
+
 
   end
 
