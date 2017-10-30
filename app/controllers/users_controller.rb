@@ -1,7 +1,7 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_int_user
-  after_action :verify_authorized, except: [:home]
+  after_action :verify_authorized, except: [:home, :approval_screen]
 
   def set_int_user
     if current_user.role == 'admin'
@@ -27,21 +27,19 @@ class UsersController < ApplicationController
     end
   end
 
-  def approval_screen
+  def approvalscreen
     authorize current_user
     if current_user.admin?
       @user = User.where(role: "admin").or(User.where(role:'tier1')).or(User.where(role:"tier2")).and(User.where(tier2_approval: 'deny'))
     elsif current_user.tier2?
       @user = User.where(tier2_approval: 'impending')
-    elsif current_user.customer? || current_user.organization?
-      @user = current_user
+      @account = Account.where(tier2_approval: 'impending')
     end
   end
 
   def index
     @users = correct_user_list
     authorize User
-
   end
 
 
