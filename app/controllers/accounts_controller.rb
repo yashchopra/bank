@@ -111,25 +111,22 @@ class AccountsController < ApplicationController
     end
   end
 
+
+  def accountapprovalscreen
+    if @user.customer? || @user.organization?
+      @account = Account.where(tier2_approval: 'impending') ||  Account.where(externaluserapproval: 'wait')
+    else
+      @user.tier2?
+      @account = Account.where(tier2_approval: 'impending')
+    end
+  end
+
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_account
     @account = Account.find(params[:id])
   end
 
-  # def approvalscreen
-  #   @user = current_user
-  #   if @user.tier2?
-  #     @account = Account.where(tier2_approval: 'deny')
-  #   elsif @user.customer? || @user.organization?
-  #     @account = @user.accounts.where(tier2_approval: 'deny').or(@user.accounts.where(externaluserapproval: 'reject'))
-  #   end
-  #   @user
-  # end
-
-  # def accountapprovalscreen
-  #   @account
-  # end
 
   def add_create_condition
     if current_user.tier1?
