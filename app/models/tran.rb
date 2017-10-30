@@ -25,7 +25,7 @@ class Tran < ApplicationRecord
   end
 
   def transaction_type_is_transfer_or_request?
-    true if ["request", "transfer"].include? credit
+    true if ["request", "transfer", "pay", "spend"].include? credit
   end
 
   def transaction_type_is_pay_spend?
@@ -38,10 +38,6 @@ class Tran < ApplicationRecord
     if last_transaction['id'] != id and (amount + last_transaction['balance']).ti_int > 2000 and credit != fee
       errors.add(:amount, "Your balance will exceed credit limit. Transaction cancelled")
     end
-  end
-
-  def transaction_type_is_transfer_or_request?
-    true if ["pay", "spend"].include? credit
   end
 
   def transaction_type_is_transfer_or_debit?
@@ -103,7 +99,6 @@ class Tran < ApplicationRecord
 
   def try
     Rails.logger.info("CitrixIndex updated at #{Time.now}")
-    puts "Yash%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%"
   end
 
 end
