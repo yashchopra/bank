@@ -3,13 +3,29 @@
         $('select').material_select();
         $('.transType select').change(function (){
             if(this.value == "credit" || this.value =="debit"){
-                if(!$('.accNum').hasClass('hidden'))
+                if(!$('.accNum').hasClass('hidden')){
                     $('.accNum').addClass('hidden');
+                    $('.routingNum').addClass('hidden');
+                }
             }else{
-                if($('.accNum').hasClass('hidden'))
-                  $('.accNum').removeClass('hidden');
+                if($('.accNum').hasClass('hidden')){
+                    $('.accNum').removeClass('hidden');
+                }
             }
         })
+        var trans_select = $('.transType select option:selected').text();
+        if(trans_select == "credit" || trans_select =="debit"){
+            if(!$('.accNum').hasClass('hidden')){
+                $('.accNum').addClass('hidden');
+                $('.routingNum').addClass('hidden');
+            }
+        }else if(trans_select == "request" || trans_select =="transfer"){
+            if($('.accNum').hasClass('hidden')){
+                $('.accNum').removeClass('hidden');
+            }
+            if($('#tran_transfer_account')[0].value.length === 16)
+                $('.routingNum').removeClass('hidden');
+        }
     });
 </script>
 

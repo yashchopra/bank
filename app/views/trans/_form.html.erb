@@ -26,6 +26,11 @@
       <%= form.text_field :transfer_account, id: :tran_transfer_account %>
     </div>
 
+    <div class="field hidden routingNum">
+      <%= form.label :'Routing Number' %>
+      <%= form.text_field :routingNum, id: :routingNum %>
+    </div>
+
     <div class="btn waves-effect waves-light" id="send-otp" type="button" name="action">
       Send OTP
     </div>
@@ -55,5 +60,10 @@
   })
   $('#transaction_otp').change(function(){
       $('#create_transaction').removeClass("disabled");
+  })
+  $('#tran_transfer_account').change(function () {
+      if(this.value.length === 16){
+          $('.routingNum').removeClass("hidden");
+      }
   })
 </script>

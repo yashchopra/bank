@@ -34,7 +34,7 @@
           <%end%>
           <% if current_user.admin? %>
             <%= link_to "log file", log_path(current_user[:id], lines:100) %>
-            <%= link_to "User account approval", approvalscreen(current_user) %>
+            <%= link_to "User account approval", approvalscreen_url(current_user) %>
           <%end%>
           <% if current_user.tier2? %>
               <%= link_to "User account approval", approvalscreen_url(current_user) %>
