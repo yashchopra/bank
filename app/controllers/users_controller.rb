@@ -63,6 +63,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     authorize current_user
+    @user = set_default_status
     respond_to do |format|
       @user = set_default_status
       # if verify_recaptcha(model: @user) && @user.save
