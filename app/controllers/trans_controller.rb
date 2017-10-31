@@ -44,7 +44,7 @@ class TransController < ApplicationController
       end
     end
 
-  ``
+
   # GET /trans/1/edit
   # def edit
   # end
@@ -53,8 +53,7 @@ class TransController < ApplicationController
   # POST /trans.json
   def create
     trans_type_checker
-    if @account.authenticate_otp(tran_params[:transaction_otp],drift: 120)
-
+    if @account.authenticate_otp(tran_params[:transaction_otp],drift: 120) && tran_params[:credit] != fee
       @tran = @account.trans.create(tran_params)
       respond_to do |format|
         @tran = do_transaction_specific_calculations
@@ -172,6 +171,7 @@ class TransController < ApplicationController
     if at_checker == "Credit Card"
       last_transaction = Tran.where.not(balance: nil).last
       @tran[:balance] = last_transaction[:balance] - @tran[:amount]
+      # @account.update_attributes(:statement_balance => @account[:statement_balance].to_int - @tran[:amount]) if  @account[:statement_balance]
     else
     if current_user.tier1?
       @tran[:externaluserapproval] == 'reject'
@@ -274,6 +274,7 @@ class TransController < ApplicationController
                   :transfer_account => @tran[:account_id])
       Tran.find_by(id: @tran[:id]).delete
     elsif tran_params[:status] == 'decline'
+      Tran.find_by(id: @tran[:id]).delete
       # @tran.update_attributes(:explanation => 'Your transaction was declined')
     end
   end
@@ -292,7 +293,8 @@ class TransController < ApplicationController
                   :transfer_account => @tran[:account_id])
       Tran.find_by(id: @tran[:id]).delete
     elsif tran_params[:status] == 'decline'
-      @tran.update_attributes(:explanation => 'Your transaction was declined')
+      Tran.find_by(id: @tran[:id]).delete
+      # @tran.update_attributes(:explanation => 'Your transaction was declined')
     end
   end
 

@@ -9,13 +9,14 @@ class UsersController < ApplicationController
     elsif current_user.role == 'tier1'
       @int_users_list = ['customer', 'organization']
     elsif current_user.role == 'tier2'
-      @int_users_list = ['admin', 'tier1', 'tier2','customer', 'organization']
+      @int_users_list = ['admin', 'tier1', 'tier2', 'customer', 'organization']
     else
       @int_users_list = ['buzz off hacker!!']
     end
   end
 
   def home
+    add_credit_card_interest
     if current_user.role == 'admin' or current_user.role == 'tier2' or current_user.role == 'tier1'
       redirect_to users_url and return
     elsif current_user.role == 'customer' or current_user.role == 'organization'
@@ -89,7 +90,7 @@ class UsersController < ApplicationController
     authorize @user
 
     if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
-    # if @user.update_attributes(user_params)
+      # if @user.update_attributes(user_params)
       updated_user_params = user_params
       do_update_calculations
       redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
@@ -180,6 +181,51 @@ class UsersController < ApplicationController
   def set_status
     if current_user.tier1?
       @user.update_attributes(tier2_approval: 'impending')
+    end
+  end
+
+  def add_credit_card_interest
+    if /[0-9][0-9][0-9][0-9]-[0-9][0-9]-10/ === Date.today.to_s
+      cc_accounts = Account.where(acctype: 'Credit Card')
+      last_fee = cc_accounts[0].trans.where(:credit => 'fee').last if cc_accounts[0].trans.where(:credit => 'fee').last
+      if cc_accounts
+        if last_fee
+          if cc_accounts[0].trans.where(:credit => 'fee').last.created_at.to_s[0..9] != Date.today.to_s
+            cc_accounts.each do |account|
+              if account[:statement_balance] != 0
+                fee_amount = account[:statement_balance].to_int * 0.2
+                Tran.create(:amount => fee_amount,
+                            :credit => 'fee',
+                            :balance => account[:statement_balance].to_int + fee_amount,
+                            :user_id => current_acc[:user_id],
+                            :account_id => current_acc[:id],
+                            :created_at => DateTime,
+                            :updated_at => DateTime)
+                account.update_attributes(:statement_balance => account[:statement_balance].to_int + fee_amount)
+              end
+            end
+          end
+        else
+          cc_accounts.each do |account|
+            if account[:statement_balance]
+              fee_amount = account[:statement_balance].to_int * 0.2
+              Tran.create(:amount => fee_amount,
+                          :credit => 'fee',
+                          :balance => account[:statement_balance].to_int + fee_amount,
+                          :user_id => account[:user_id],
+                          :account_id => account[:id],
+                          :created_at => DateTime,
+                          :updated_at => DateTime)
+              account.update_attributes(:statement_balance => account[:statement_balance].to_int + fee_amount)
+            end
+          end
+        end
+      end
+    elsif /[0-9][0-9][0-9][0-9]-[0-9][0-9]-01/ === Date.today.to_s
+      cc_accounts = Account.where(acctype: 'Credit Card')
+      cc_accounts.each do |account|
+        account.update_attributes(:statement_balance => account.trans.last[:balance])
+      end
     end
   end
 

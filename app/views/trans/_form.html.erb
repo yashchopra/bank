@@ -13,7 +13,7 @@
 
     <div class="field">
       <%= form.label :amount %>
-      <%= form.text_field :amount, id: :tran_amount %>
+      <%= form.number_field :amount, id: :tran_amount, step: :any %>
     </div>
 
     <div class="field transType">

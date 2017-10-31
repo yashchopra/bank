@@ -36,7 +36,7 @@
           </td>
           <td>
             <strong>Balance:</strong>
-            <%= @account.trans.where.not(balance: nil).last.balance %>
+            <%= @account.statement_balance %>
           </td>
         </tr>
 
