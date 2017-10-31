@@ -88,8 +88,8 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     authorize @user
     respond_to do |format|
-      # if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
-        if @user.update_attributes(user_params)
+      if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
+        # if @user.update_attributes(user_params)
         # updated_user_params = user_params
         do_update_calculations
         format.html {redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'}
