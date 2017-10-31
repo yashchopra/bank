@@ -7,13 +7,13 @@
           <div class="row">
           <div class="input-field col s6">
             <%= f.label :email %><br/>
-            <%= f.email_field :email, autofocus: true, class: "key" %>
+            <%= f.email_field :email, autofocus: true, class: "key",:required => true  %>
           </div>
           </div>
           <div class="row">
           <div class="input-field col s6">
             <%= f.label :password %><br/>
-            <%= f.password_field :password, autocomplete: "off", class: "keypswd" %>
+            <%= f.password_field :password, autocomplete: "off", class: "keypswd",:required => true %>
           </div>
           </div>
 

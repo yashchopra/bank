@@ -72,8 +72,8 @@ class UsersController < ApplicationController
       @user = set_default_status
       # @user.tier2_approval = "Y"
       # @user[:externaluserapproval] = "wait"
-      # if verify_recaptcha(model: @user) && @user.save
-      if @user.save
+      if verify_recaptcha(model: @user) && @user.save
+      #if @user.save
         format.html {redirect_to users_url, notice: 'Account was successfully created.'}
         format.json {render :show, status: :created, location: @user}
       else

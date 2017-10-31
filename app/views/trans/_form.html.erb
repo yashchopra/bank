@@ -13,7 +13,7 @@
 
     <div class="field">
       <%= form.label :amount %>
-      <%= form.number_field :amount, id: :tran_amount, step: :any %>
+      <%= form.number_field :amount, id: :tran_amount,:required => true, step: :any %>
     </div>
 
     <div class="field transType">
@@ -39,7 +39,7 @@
     <br/>
     <div class="field">
       <%= form.label 'Enter OTP' %>
-      <%= form.text_field :transaction_otp, id: :transaction_otp %>
+      <%= form.text_field :transaction_otp, id: :transaction_otp, :required => true %>
     </div>
 
     <div class="btn waves-effect waves-light disabled" type="submit" name="action" id="create_transaction">

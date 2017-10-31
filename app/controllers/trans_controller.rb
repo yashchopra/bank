@@ -69,7 +69,7 @@ class TransController < ApplicationController
 
       respond_to do |format|
         format.html {render :new, notice: 'Transaction Unsuccessful!'}
-        format.json {render json: @tran_mod.errors, status: :unprocessable_entity}
+        format.json {render json: 'Transaction Unsuccessful', status: :unprocessable_entity}
       end
     end
   end
