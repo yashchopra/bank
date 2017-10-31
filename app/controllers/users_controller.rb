@@ -85,17 +85,21 @@ class UsersController < ApplicationController
   end
 
   def update
-
     @user = User.find(params[:id])
     authorize @user
-
-    if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
-      # if @user.update_attributes(user_params)
-      updated_user_params = user_params
-      do_update_calculations
-      redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
-    else
-      redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull' and return
+    respond_to do |format|
+      # if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
+        if @user.update_attributes(user_params)
+        # updated_user_params = user_params
+        do_update_calculations
+        format.html {redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'}
+        format.json {render :show, status: :created, location: @user}
+        # redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
+      else
+        # redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull' and return
+        format.html {redirect_to user_accounts_path(@current_user), notice: 'User update cancel'}
+        format.json {render json: @user.errors, status: :unprocessable_entity}
+      end
     end
   end
 
@@ -113,7 +117,7 @@ class UsersController < ApplicationController
 
 
   def user_params
-    params.require(:user).permit(:role, :email, :password, :password_confirmation, :phone, :first_name, :last_name, :city, :state, :country, :street, :zip, :updated_email, :updated_phone, :status, :ssn)
+    params.require(:user).permit(:role, :email, :password, :password_confirmation, :phone, :first_name, :last_name, :city, :state, :country, :street, :zip, :updated_email, :updated_phone, :status, :ssn, :isEligibleForTier1, :tier2_approval, :externaluserapproval)
   end
 
   def correct_user_list
