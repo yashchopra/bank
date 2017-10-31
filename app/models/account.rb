@@ -1,12 +1,17 @@
 class Account < ApplicationRecord
+  has_one_time_password
   belongs_to :user
-  has_many :trans, dependent: :delete_all
+  has_many :trans, dependent: :destroy
   accepts_nested_attributes_for :trans
   before_save :set_account_number
   validate :number_of_accounts
   validate :all_the_inputs
   enum externaluserapproval: [:wait ,:accept, :reject]
   enum tier2_approval: [:impending,  :allow, :deny ]
+
+  def generateOTP
+    self.otp_code = Account.otp_code
+  end
 
   private
 
@@ -33,7 +38,8 @@ class Account < ApplicationRecord
   def get_unique_credit_card_number
     not_unique = true
     while not_unique
-      credit_card_number = rand.to_s[-16..-1]
+      credit_card_number = rand.to_s[-12..-1]
+      credit_card_number = '4223' << credit_card_number
       not_unique = Account.exists?(accnumber: credit_card_number)
     end
     credit_card_number

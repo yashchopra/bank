@@ -16,6 +16,7 @@ class AccountsController < ApplicationController
   # GET /accounts/1
   # GET /accounts/1.json
   def show
+    @account = Account.find_by_id(params[:id])
     if @account[:externaluserapproval] == 'wait' or @account[:tier2_approval] == 'impending'
       redirect_to accountapprovalscreen_url(current_user, @account) and return
     else
@@ -43,8 +44,19 @@ class AccountsController < ApplicationController
 
   # GET /accounts/new
   def new
-    @account = @user.accounts.new
-    actp
+    if @current_user && (@current_user.role == 'tier1' || @current_user.role== 'tier2' || @current_user.role== 'admin')
+      @account = @user.accounts.new
+      actp
+    end
+  end
+
+  def send_otp_to_email
+    account = Account.find_by_id(params[:id])
+    code = account.otp_code
+
+    # account.update_attribute(:otp_secret_key , account.otp_code )
+    email = account.user.email
+    UserMailer.send_trans_otp(email, code).deliver
   end
 
   def actp
@@ -69,6 +81,7 @@ class AccountsController < ApplicationController
   # POST /accounts
   # POST /accounts.json
   def create
+
     @account = @user.accounts.create(account_params)
     # @account = Account.new(account_params)
 
@@ -115,16 +128,14 @@ class AccountsController < ApplicationController
   def accountapprovalscreen
     if @user.customer? || @user.organization?
       @account = Account.where(tier2_approval: 'impending') ||  Account.where(externaluserapproval: 'wait')
-    else
-      @user.tier2?
-      @account = Account.where(tier2_approval: 'impending')
+      @user = current_user
     end
   end
 
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_account
-    @account = Account.find(params[:id])
+      @account = Account.find(params[:id])
   end
 
 

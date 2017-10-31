@@ -1,0 +1,23 @@
+<script>
+    $(document).ready(function () {
+        $('select').material_select();
+    });
+
+    $(document).ready(function () {
+        $('.collapsible').collapsible();
+    });
+</script>
+
+<div class="container">
+  <div class="row">
+    <div class="col m8 offset-m3">
+          <%= form_for(@user) do |f| %>
+              <span> Tier2/Admin approving account:</span>
+              <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %>
+              <div class="btn waves-effect waves-light" type="submit" name="action">
+                <%= f.submit 'Update info' %>
+              </div>
+          <% end %>
+    </div>
+  </div>
+</div>

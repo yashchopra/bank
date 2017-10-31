@@ -2,7 +2,7 @@ class TransController < ApplicationController
   before_action :authenticate_user!
   before_action :set_tran, only: [:show, :edit, :update, :destroy]
   before_action :set_account
-  before_action :trans_type_checker
+  before_action :trans_type_checker, only:[:new, :create]
 
   # GET /trans
   # GET /trans.json
@@ -44,7 +44,7 @@ class TransController < ApplicationController
       end
     end
 
-  ``
+
   # GET /trans/1/edit
   # def edit
   # end
@@ -53,16 +53,23 @@ class TransController < ApplicationController
   # POST /trans.json
   def create
     trans_type_checker
-    @tran = @account.trans.create(tran_params)
+    if @account.authenticate_otp(tran_params[:transaction_otp],drift: 120) && tran_params[:credit] != fee
+      @tran = @account.trans.create(tran_params)
+      respond_to do |format|
+        @tran = do_transaction_specific_calculations
+        if @tran.save
+          format.html {redirect_to user_account_path(@user, @account), notice: 'Tran was successfully created.'}
+          format.json {render :show, status: :created, location: @tran}
+        else
+          format.html {render :new}
+          format.json {render json: @tran_mod.errors, status: :unprocessable_entity}
+        end
+      end
+    else
 
-    respond_to do |format|
-      @tran = do_transaction_specific_calculations
-      if @tran.save
-        format.html {redirect_to user_account_path(@user, @account), notice: 'Tran was successfully created.'}
-        format.json {render :show, status: :created, location: @tran}
-      else
-        format.html {render :new}
-        format.json {render json: @tran_mod.errors, status: :unprocessable_entity}
+      respond_to do |format|
+        format.html {render :new, notice: 'Transaction Unsuccessful!'}
+        format.json {render json: 'Transaction Unsuccessful', status: :unprocessable_entity}
       end
     end
   end
@@ -142,7 +149,7 @@ class TransController < ApplicationController
     else
       @tran[:externaluserapproval] == 'accept'
     end
-    if @tran[:amount]>100000
+    if @tran[:amount] > 100000.00
       @tran[:isEligibleForTier1] = 'no'
       @tran[:status] = "pending"
       @tran[:isCritical] = 'true'
@@ -164,6 +171,7 @@ class TransController < ApplicationController
     if at_checker == "Credit Card"
       last_transaction = Tran.where.not(balance: nil).last
       @tran[:balance] = last_transaction[:balance] - @tran[:amount]
+      # @account.update_attributes(:statement_balance => @account[:statement_balance].to_int - @tran[:amount]) if  @account[:statement_balance]
     else
     if current_user.tier1?
       @tran[:externaluserapproval] == 'reject'
@@ -266,6 +274,7 @@ class TransController < ApplicationController
                   :transfer_account => @tran[:account_id])
       Tran.find_by(id: @tran[:id]).delete
     elsif tran_params[:status] == 'decline'
+      Tran.find_by(id: @tran[:id]).delete
       # @tran.update_attributes(:explanation => 'Your transaction was declined')
     end
   end
@@ -284,7 +293,8 @@ class TransController < ApplicationController
                   :transfer_account => @tran[:account_id])
       Tran.find_by(id: @tran[:id]).delete
     elsif tran_params[:status] == 'decline'
-      @tran.update_attributes(:explanation => 'Your transaction was declined')
+      Tran.find_by(id: @tran[:id]).delete
+      # @tran.update_attributes(:explanation => 'Your transaction was declined')
     end
   end
 
@@ -373,7 +383,7 @@ class TransController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def tran_params
-    params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status, :isEligibleForTier1, :isCritical)
+    params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status, :isEligibleForTier1, :isCritical, :transaction_otp)
     end
 end
 

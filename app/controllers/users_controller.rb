@@ -1,45 +1,50 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_int_user
-  after_action :verify_authorized, except: [:home]
+  after_action :verify_authorized, except: [:home, :approval_screen, :approvalscreen_user]
 
   def set_int_user
     if current_user.role == 'admin'
       @int_users_list = ['admin', 'tier1', 'tier2']
-    elsif current_user.role == 'tier1' or current_user.role == 'tier2'
+    elsif current_user.role == 'tier1'
       @int_users_list = ['customer', 'organization']
+    elsif current_user.role == 'tier2'
+      @int_users_list = ['admin', 'tier1', 'tier2', 'customer', 'organization']
     else
-      @int_users_list = []
+      @int_users_list = ['buzz off hacker!!']
     end
   end
 
   def home
+    add_credit_card_interest
     if current_user.role == 'admin' or current_user.role == 'tier2' or current_user.role == 'tier1'
       redirect_to users_url and return
     elsif current_user.role == 'customer' or current_user.role == 'organization'
-      if current_user.tier2_approval == 'deny' or current_user.externaluserapproval == 'reject'
-        redirect_to approval_screen and return
+      if current_user.tier2_approval == 0 or current_user.tier2_approval == 'impending' or current_user.externaluserapproval == 0 or current_user.externaluserapproval=='wait'
+        redirect_to approvalscreen_user_url(current_user) and return
       else
         redirect_to user_accounts_path(@current_user) and return
       end
     end
   end
 
-  def approval_screen
+  def approvalscreen
     authorize current_user
     if current_user.admin?
-      @user = User.where(role: "admin").or(User.where(role:'tier1')).or(User.where(role:"tier2")).and(User.where(tier2_approval: 'deny'))
+      @user = User.where(role: "admin",tier2_approval: 'impending').or(User.where(role:'tier1',tier2_approval: 'impending')).or(User.where(role:"tier2",tier2_approval: 'impending' ))
     elsif current_user.tier2?
       @user = User.where(tier2_approval: 'impending')
-    elsif current_user.customer? || current_user.organization?
-      @user = current_user
+      @account = Account.where(tier2_approval: 'impending')
     end
+  end
+
+  def approvalscreen_user
+    @user = current_user
   end
 
   def index
     @users = correct_user_list
     authorize User
-
   end
 
 
@@ -63,11 +68,12 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     authorize current_user
-    @user = set_default_status
     respond_to do |format|
       @user = set_default_status
-      # if verify_recaptcha(model: @user) && @user.save
-      if @user.save
+      # @user.tier2_approval = "Y"
+      # @user[:externaluserapproval] = "wait"
+      if verify_recaptcha(model: @user) && @user.save
+      #if @user.save
         format.html {redirect_to users_url, notice: 'Account was successfully created.'}
         format.json {render :show, status: :created, location: @user}
       else
@@ -79,17 +85,21 @@ class UsersController < ApplicationController
   end
 
   def update
-
     @user = User.find(params[:id])
     authorize @user
-
-    if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
-    # if @user.update_attributes(user_params)
-      updated_user_params = user_params
-      do_update_calculations
-      redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
-    else
-      redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull' and return
+    respond_to do |format|
+      if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
+        # if @user.update_attributes(user_params)
+        # updated_user_params = user_params
+        do_update_calculations
+        format.html {redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'}
+        format.json {render :show, status: :created, location: @user}
+        # redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
+      else
+        # redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull' and return
+        format.html {redirect_to user_accounts_path(@current_user), notice: 'User update cancel'}
+        format.json {render json: @user.errors, status: :unprocessable_entity}
+      end
     end
   end
 
@@ -107,7 +117,7 @@ class UsersController < ApplicationController
 
 
   def user_params
-    params.require(:user).permit(:role, :email, :password, :password_confirmation, :phone, :first_name, :last_name, :city, :state, :country, :street, :zip, :updated_email, :updated_phone, :status, :ssn, :tier2_approval, :externaluserapproval)
+    params.require(:user).permit(:role, :email, :password, :password_confirmation, :phone, :first_name, :last_name, :city, :state, :country, :street, :zip, :updated_email, :updated_phone, :status, :ssn, :isEligibleForTier1, :tier2_approval, :externaluserapproval)
   end
 
   def correct_user_list
@@ -175,6 +185,51 @@ class UsersController < ApplicationController
   def set_status
     if current_user.tier1?
       @user.update_attributes(tier2_approval: 'impending')
+    end
+  end
+
+  def add_credit_card_interest
+    if /[0-9][0-9][0-9][0-9]-[0-9][0-9]-10/ === Date.today.to_s
+      cc_accounts = Account.where(acctype: 'Credit Card')
+      last_fee = cc_accounts[0].trans.where(:credit => 'fee').last if cc_accounts[0].trans.where(:credit => 'fee').last
+      if cc_accounts
+        if last_fee
+          if cc_accounts[0].trans.where(:credit => 'fee').last.created_at.to_s[0..9] != Date.today.to_s
+            cc_accounts.each do |account|
+              if account[:statement_balance] != 0
+                fee_amount = account[:statement_balance].to_int * 0.2
+                Tran.create(:amount => fee_amount,
+                            :credit => 'fee',
+                            :balance => account[:statement_balance].to_int + fee_amount,
+                            :user_id => current_acc[:user_id],
+                            :account_id => current_acc[:id],
+                            :created_at => DateTime,
+                            :updated_at => DateTime)
+                account.update_attributes(:statement_balance => account[:statement_balance].to_int + fee_amount)
+              end
+            end
+          end
+        else
+          cc_accounts.each do |account|
+            if account[:statement_balance]
+              fee_amount = account[:statement_balance].to_int * 0.2
+              Tran.create(:amount => fee_amount,
+                          :credit => 'fee',
+                          :balance => account[:statement_balance].to_int + fee_amount,
+                          :user_id => account[:user_id],
+                          :account_id => account[:id],
+                          :created_at => DateTime,
+                          :updated_at => DateTime)
+              account.update_attributes(:statement_balance => account[:statement_balance].to_int + fee_amount)
+            end
+          end
+        end
+      end
+    elsif /[0-9][0-9][0-9][0-9]-[0-9][0-9]-01/ === Date.today.to_s
+      cc_accounts = Account.where(acctype: 'Credit Card')
+      cc_accounts.each do |account|
+        account.update_attributes(:statement_balance => account.trans.last[:balance])
+      end
     end
   end
 
