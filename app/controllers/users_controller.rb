@@ -94,6 +94,7 @@ class UsersController < ApplicationController
         do_update_calculations
         format.html {redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'}
         format.json {render :show, status: :created, location: @user}
+        change_tran_status
         # redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
       else
         # redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull' and return
@@ -143,6 +144,13 @@ class UsersController < ApplicationController
       redirect_to destroy_user_session_path
       # sign_out_and_redirect(current_user)
       # redirect_to signout_path and return
+    end
+  end
+
+  def change_tran_status
+    if user_params['tier2_approval'] == 'allow' or user_params['externaluserapproval'] == 'accept'
+      @user.update_attributes(:externaluserapproval => '')
+      @user.update_attributes(:tier2_approval => '')
     end
   end
 

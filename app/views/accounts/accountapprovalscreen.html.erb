@@ -8,15 +8,15 @@
     });
 
 
-    var onloadCallback = function() {
+    var onloadCallback = function () {
         // Renders the HTML element with id 'example1' as a reCAPTCHA widget.
         // The id of the reCAPTCHA widget is assigned to 'widgetId1'.
         debugger;
         var recaptcha_elements = $('.recaptcha');
         var widgetId2;
-        for(var i=0;i<recaptcha_elements.length;i++){
+        for (var i = 0; i < recaptcha_elements.length; i++) {
             widgetId2 = grecaptcha.render(recaptcha_elements[i], {
-                'sitekey' : "<%= Recaptcha.configuration.site_key %>"
+                'sitekey': "<%= Recaptcha.configuration.site_key %>"
             });
         }
 
@@ -30,25 +30,27 @@
 <div class="container">
   <div class="row">
     <div class="col m8 offset-m3">
-      <% @account.each do |account| %>
-          <%= form_for(account) do |f| %>
+      <% if @account %>
 
-              <% if current_user.customer? || current_user.organization? %>
-                  <span> User approving account:</span>
-                  <%= f.select(:externaluserapproval, Account.externaluserapprovals.keys.map {|externaluserapproval| [externaluserapproval.titleize, externaluserapproval]}) %>
-              <% else %>
-                  <span> Tier2/Admin approving account:</span>
-                  <%= f.select(:tier2_approval, Account.tier2_approvals.keys.map {|tier2_approval| [tier2_approval.titleize, tier2_approval]}) %>
+          <% @account.each do |account| %>
+              <%= form_for(account) do |f| %>
+
+                  <% if current_user.customer? || current_user.organization? %>
+                      <span> User approving account:</span>
+                      <%= f.select(:externaluserapproval, Account.externaluserapprovals.keys.map {|externaluserapproval| [externaluserapproval.titleize, externaluserapproval]}) %>
+                  <% else %>
+                      <span> Tier2/Admin approving account:</span>
+                      <%= f.select(:tier2_approval, Account.tier2_approvals.keys.map {|tier2_approval| [tier2_approval.titleize, tier2_approval]}) %>
+                  <% end %>
+
+
+                  <div class="btn waves-effect waves-light" type="submit" name="action">
+                    <div class="recaptcha"></div>
+                    <%= f.submit 'Update info' %>
+                  </div>
               <% end %>
-
-
-              <div class="btn waves-effect waves-light" type="submit" name="action">
-                <div class="recaptcha"></div>
-                <%= f.submit 'Update info' %>
-              </div>
           <% end %>
       <% end %>
-
     </div>
   </div>
 </div>

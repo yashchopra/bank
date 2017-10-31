@@ -6,63 +6,59 @@
     $(document).ready(function () {
         $('.collapsible').collapsible();
     });
+
+    var onloadCallback = function () {
+        // Renders the HTML element with id 'example1' as a reCAPTCHA widget.
+        // The id of the reCAPTCHA widget is assigned to 'widgetId1'.
+        debugger;
+        var recaptcha_elements = $('.recaptcha');
+        var widgetId2;
+        for (var i = 0; i < recaptcha_elements.length; i++) {
+            widgetId2 = grecaptcha.render(recaptcha_elements[i], {
+                'sitekey': "<%= Recaptcha.configuration.site_key %>"
+            });
+        }
+
+    };
+
 </script>
+<script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
+
 <div style="width: 100%;overflow:auto;">
 
   <div style="float:left; width: 35%">
-      <h5 class="black-text">Approve Users</h5>
-      <% if @user %>
-          <% @user.each do |user| %>
-              <%= form_for(user) do |f| %>
-                  <ul class="collapsible" data-collapsible="accordion">
-                    <li>
-                      <div class="collapsible-header">
-
-                        <span>User Name:
-                          <%= user.first_name %>
-                          <%= user.last_name %>
-                         </span>
-
-                      </div>
-                      <div class="collapsible-body">
-                        <span> <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %> </span>
-                      </div>
-                    </li>
-                  </ul>
-                  <div class="btn waves-effect waves-light" type="submit" name="action">
-                    <%= f.submit 'Update info' %>
-                  </div>
-              <% end %>
-          <% end %>
-      <% end %>
-    </div>
+    <h5 class="black-text">Approve Users</h5>
+    <% if @user %>
+        <% @user.each do |user| %>
+            <%= form_for(user) do |f| %>
+                <span>User Name: <%= user.first_name %> <%= user.last_name %></span>
+                <span> <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %> </span>
+                <div class="recaptcha"></div>
+                <div class="btn waves-effect waves-light" type="submit" name="action">
+                  <%= f.submit 'Update info' %>
+                </div>
+            <% end %>
+        <% end %>
+    <% end %>
+  </div>
 
 
   <div style="width: 35%; float:left; margin-left:4.25%;">
-      <h5>Approve Accounts</h5>
-      <% if @account %>
-          <% @account.each do |account| %>
-              <%= form_for(account) do |f| %>
-                  <ul class="collapsible" data-collapsible="accordion">
-                    <li>
-                      <div class="collapsible-header">
-                        <span>Account number: <%= Account.find_by_id(tran.account_id)[:accnumber] %> </span>
-                        <span style="margin-left: 30px;">Amount: <%= tran.amount %> </span>
-
-                      </div>
-                      <div class="collapsible-body">
-                        <span> <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %> </span>
-                      </div>
-                    </li>
-                  </ul>
-                  <div class="btn waves-effect waves-light" type="submit" name="action">
-                    <%= f.submit 'Update info' %>
-                  </div>
-              <% end %>
-          <% end %>
-      <% end %>
-    </div>
-
+    <h5>Approve Accounts</h5>
+    <% if @account %>
+        <% @account.each do |account| %>
+            <%= form_for(account) do |f| %>
+                <span>Account number: <%= account[:accnumber] %> </span>
+                <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %>
+                <div class="recaptcha"></div>
+                <div class="btn waves-effect waves-light" type="submit" name="action">
+                  <%= f.submit 'Update info' %>
+                </div>
+            <% end %>
+        <% end %>
+    <% end %>
   </div>
-    </div>
+
+</div>
+</div>
 
