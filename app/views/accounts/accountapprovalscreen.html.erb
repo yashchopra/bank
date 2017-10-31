@@ -37,15 +37,15 @@
 
                   <% if current_user.customer? || current_user.organization? %>
                       <span> User approving account:</span>
+
                       <%= f.select(:externaluserapproval, Account.externaluserapprovals.keys.map {|externaluserapproval| [externaluserapproval.titleize, externaluserapproval]}) %>
                   <% else %>
                       <span> Tier2/Admin approving account:</span>
                       <%= f.select(:tier2_approval, Account.tier2_approvals.keys.map {|tier2_approval| [tier2_approval.titleize, tier2_approval]}) %>
                   <% end %>
 
-
+                  <div class="recaptcha"></div>
                   <div class="btn waves-effect waves-light" type="submit" name="action">
-                    <div class="recaptcha"></div>
                     <%= f.submit 'Update info' %>
                   </div>
               <% end %>

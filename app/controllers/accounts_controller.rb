@@ -104,11 +104,11 @@ class AccountsController < ApplicationController
   # PATCH/PUT /accounts/1.json
   def update
     respond_to do |format|
-      if @account.update(account_params)
+      if verify_recaptcha(model: @user) && @account.update(account_params)
         format.html {redirect_to user_account_path(@user, @account), notice: 'Account was successfully updated.'}
         format.json {render :show, status: :ok, location: @account}
       else
-        format.html {render :edit}
+        format.html {redirect_to user_account_path(@user, @account)}
         format.json {render json: @account.errors, status: :unprocessable_entity}
       end
     end
@@ -127,9 +127,12 @@ class AccountsController < ApplicationController
 
   def accountapprovalscreen
     if @user.customer? || @user.organization?
-      @account = Account.where(tier2_approval: 'impending') ||  Account.where(externaluserapproval: 'wait')
+      @account = @user.accounts.where(tier2_approval: 'impending') ||  @user.accounts.where(externaluserapproval: 'wait')
       @user = current_user
+    else
+      @account = Accounts.where(tier2_approval: 'impending') ||  Accounts.where(externaluserapproval: 'wait')
     end
+
   end
 
   private
@@ -186,7 +189,7 @@ class AccountsController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def account_params
-    params.require(:account).permit(:acctype, :accnumber, :accrouting, :user_id)
+    params.require(:account).permit(:acctype, :accnumber, :accrouting, :user_id, :tier2_approval, :externaluserapproval)
   end
 
   # def verify_userapproval
