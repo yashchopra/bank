@@ -59,7 +59,6 @@ class Tran < ApplicationRecord
   end
 
   def transfer_account_conditions
-
     account_to_transfer_exist = (Account.exists?(accnumber: transfer_account) or (User.exists?(email: transfer_account)) or (User.exists?(phone: transfer_account)))
 
     if account_to_transfer_exist && transfer_himself

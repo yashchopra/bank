@@ -149,7 +149,7 @@ class TransController < ApplicationController
     else
       @tran[:externaluserapproval] == 'accept'
     end
-    if @tran[:amount]>100000
+    if @tran[:amount] > 100000.00
       @tran[:isEligibleForTier1] = 'no'
       @tran[:status] = "pending"
       @tran[:isCritical] = 'true'

@@ -11,7 +11,7 @@
             <button class="waves-effect waves-light btn"> <%= link_to 'Back to Accounts', user_accounts_path(@account.user_id) %> </button>
           </td>
           <td>
-            <%= link_to "Download PDF", { :action => "show", :format => :pdf }, class: 'waves-effect waves-light btn', target: '_blank'%>
+            <%= link_to "Download PDF", {:action => "show", :format => :pdf}, class: 'waves-effect waves-light btn', target: '_blank' %>
           </td>
           <td>
             <button class="waves-effect waves-light btn"> <%= link_to 'New Transaction', new_account_tran_path(@account) %> </button>
@@ -36,7 +36,11 @@
           </td>
           <td>
             <strong>Balance:</strong>
-            <%= @account.statement_balance %>
+            <% if @account == 'Credit Card' %>
+                <%= @account.statement_balance %>
+            <% else %>
+                <%= @account.trans.where.not(balance: nil).last.balance %>
+            <% end %>
           </td>
         </tr>
 
@@ -61,9 +65,9 @@
               <td><%= tran.balance %></td>
               <!--<#% if not current_user.customer? %>-->
               <!--<td><#%= #link_to 'Destroy', account_tran_path(@account, tran), method: :delete, data: {confirm: 'Are you sure?'}%></td>-->
-            <!--<#%end%>-->
+              <!--<#%end%>-->
             </tr>
-            <% end %>
+        <% end %>
         </tbody>
 
       </table>
