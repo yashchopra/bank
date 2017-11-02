@@ -16,6 +16,7 @@ class UsersController < ApplicationController
   end
 
   def home
+    my_logger
     add_credit_card_interest
     if current_user.role == 'admin' or current_user.role == 'tier2' or current_user.role == 'tier1'
       redirect_to users_url and return
@@ -104,15 +105,19 @@ class UsersController < ApplicationController
     end
   end
 
+  def my_logger
+    $my_logger ||= Logger.new("#{Rails.root}/log/my.log")
+  end
+
   def log
     @user = current_user
     authorize @user
 
     lines = params[:lines]
     if Rails.env == "production"
-      @logs = `tail -n #{lines} log/production.log`
+      @logs = `tail -n #{lines} log/my.log`
     else
-      @logs = `tail -n #{lines} log/development.log`
+      @logs = `tail -n #{lines} log/my.log`
     end
   end
 

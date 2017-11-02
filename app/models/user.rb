@@ -30,7 +30,7 @@ class User < ApplicationRecord
 	#  					:length => { :minimum => 9, :maximum => 9 }
 
 
-	def set_default_role  
+	def set_default_role
 		self.role ||= :customer
 	end
 
