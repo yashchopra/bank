@@ -3,7 +3,7 @@
     <div class="col m8 offset-m3">
       <h5>Hi, you received a code by email, please enter it below, thanks!</h5>
 
-      <%= form_tag([resource_name, :two_factor_authentication], :method => :put) do %>
+      <%= form_tag([resource_name, :two_factor_authentication], :method => :put, :class => 'key') do %>
           <%= text_field_tag :code %>
           <%= submit_tag "Log in!" %>
       <% end %>
