@@ -3,9 +3,9 @@
     <div class="col m8 offset-m3">
       <h5>Hi, you received a code by email, please enter it below, thanks!</h5>
 
-      <%= form_tag([resource_name, :two_factor_authentication], :method => :put, remote: true) do %>
-          <%= text_field_tag :code, "", class: "key" %>
-          <%= submit_tag "Log in!" %>
+      <%= form_tag([resource_name, :two_factor_authentication], :method => :put) do %>
+          <%= text_field_tag :code,"", class: "keypswd"%>
+	  <%= submit_tag "Log in!" %>
       <% end %>
 
       <%= link_to "Sign out", destroy_user_session_path, :method => :delete %>
