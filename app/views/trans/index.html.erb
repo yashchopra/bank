@@ -56,7 +56,7 @@
       </thead>
 
       <tbody>
-      <% @user.each do |user| %>
+      <% @user_list.each do |user| %>
           <tr>
             <td> <%= link_to "#{user.email}", user_accounts_path(user.id) %> </td>
           </tr>

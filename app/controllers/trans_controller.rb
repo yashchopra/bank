@@ -11,9 +11,11 @@ class TransController < ApplicationController
     if current_user.tier1?
       @trans = Tran.where(status: 'pending', isEligibleForTier1: 'yes')
       @user = User.where(role: 'customer').or(User.where(role: 'organization'))
+      @user_list = User.where(role: 'customer').or(User.where(role: 'organization'))
     elsif current_user.tier2?
       @trans = Tran.where(status: 'pending')
-      @user = User.where(role: 'customer').or(User.where(role: 'organization'))
+      @user = User.where(role: 'customer', :status => 'pending').or(User.where(role: 'organization', :status => 'pending'))
+      @user_list = User.where(role: 'customer').or(User.where(role: 'organization'))
     else
       user_not_authorized and return
     end
@@ -38,14 +40,14 @@ class TransController < ApplicationController
     if !@tran.nil?
       at_checker = Account.find_by_id(@tran[:account_id])[:acctype]
     end
-      if at_checker == "Credit Card"
-        @trans_types = ['pay', 'spend']
-      elsif at_checker == "Checking" or at_checker == "Savings"
-        @trans_types = ['credit', 'debit', 'transfer', 'request']
-      else
-        @trans_types = ['Not enough Balance']
-      end
+    if at_checker == "Credit Card"
+      @trans_types = ['pay', 'spend']
+    elsif at_checker == "Checking" or at_checker == "Savings"
+      @trans_types = ['credit', 'debit', 'transfer', 'request']
+    else
+      @trans_types = ['Not enough Balance']
     end
+  end
 
 
   # GET /trans/1/edit
@@ -56,7 +58,7 @@ class TransController < ApplicationController
   # POST /trans.json
   def create
     trans_type_checker
-    if @account.authenticate_otp(tran_params[:transaction_otp],drift: 120) && tran_params[:credit] != fee
+    if @account.authenticate_otp(tran_params[:transaction_otp],drift: 120) && tran_params[:credit] != 'fee'
       @tran = @account.trans.create(tran_params)
       respond_to do |format|
         @tran = do_transaction_specific_calculations
@@ -148,25 +150,26 @@ class TransController < ApplicationController
       last_transaction = Tran.where.not(balance: nil).last
       @tran[:balance] = last_transaction[:balance] + @tran[:amount]
     else
-    #@tran[:balance] = last_transaction[:balance] + @tran[:amount]
-    if current_user.tier1?
-      @tran[:externaluserapproval] == 'reject'
-    else
-      @tran[:externaluserapproval] == 'accept'
-    end
-    if @tran[:amount] > 100000.00
-      @tran[:isEligibleForTier1] = 'no'
-      @tran[:status] = "pending"
-      @tran[:isCritical] = 'true'
-    else
-      @tran[:isCritical] = "false"
-      @tran[:isEligibleForTier1] = "yes"
-      @tran[:status] = "pending"
-    end
+      #@tran[:balance] = last_transaction[:balance] + @tran[:amount]
+      if current_user.tier1?
+        @tran[:externaluserapproval] == 'reject'
+      else
+        @tran[:externaluserapproval] == 'accept'
+      end
+      if @tran[:amount] > 100000.00
+        @tran[:isEligibleForTier1] = 'no'
+        @tran[:status] = "pending"
+        @tran[:isCritical] = 'true'
+      else
+        @tran[:isCritical] = "false"
+        @tran[:isEligibleForTier1] = "yes"
+        @tran[:status] = "pending"
+      end
     end
     @tran
 
   end
+
   def check_debit_conditions
 
     # This query is used to find the account balance
@@ -178,21 +181,21 @@ class TransController < ApplicationController
       @tran[:balance] = last_transaction[:balance] - @tran[:amount]
       # @account.update_attributes(:statement_balance => @account[:statement_balance].to_int - @tran[:amount]) if  @account[:statement_balance]
     else
-    if current_user.tier1?
-      @tran[:externaluserapproval] == 'reject'
-    else
-      @tran[:externaluserapproval] == 'accept'
+      if current_user.tier1?
+        @tran[:externaluserapproval] == 'reject'
+      else
+        @tran[:externaluserapproval] == 'accept'
+      end
+      if @tran[:amount]>100000
+        @tran[:isCritical] = 'true'
+        @tran[:isEligibleForTier1] = 'no'
+        @tran[:status] = "pending"
+      else
+        @tran[:isCritical] = 'false'
+        @tran[:isEligibleForTier1] = 'yes'
+        @tran[:status] = "pending"
+      end
     end
-    if @tran[:amount]>100000
-      @tran[:isCritical] = 'true'
-      @tran[:isEligibleForTier1] = 'no'
-      @tran[:status] = "pending"
-    else
-      @tran[:isCritical] = 'false'
-      @tran[:isEligibleForTier1] = 'yes'
-      @tran[:status] = "pending"
-    end
-  end
     @tran
   end
 
@@ -315,7 +318,6 @@ class TransController < ApplicationController
                   :created_at => DateTime,
                   :updated_at => DateTime,
                   :transfer_account => @tran[:account_id])
-
       Tran.find_by(id: @tran[:id]).delete
       current_acc = Account.find_by(id: @tran[:account_id])
       current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
@@ -353,7 +355,7 @@ class TransController < ApplicationController
       current_tran_last_balance = current_acc.trans.where.not(balance: nil).last
       Tran.create(:amount => @tran[:amount].to_s,
                   :credit => 'debit',
-                  :balance => current_tran_last_balance[:balance] + @tran[:amount],
+                  :balance => current_tran_last_balance[:balance] - @tran[:amount],
                   :user_id => current_acc[:user_id],
                   :account_id => current_acc[:id],
                   :created_at => DateTime,
@@ -363,17 +365,18 @@ class TransController < ApplicationController
       current_acc = Account.find_by(id: @tran[:account_id])
       current_acc_last_transaction = current_acc.trans.where.not(balance: nil).last
       Tran.create(:amount => @tran[:amount].to_s,
-                  :credit => 'credit',
-                  :balance => current_acc_last_transaction[:balance] - @tran[:amount],
+                  :credit => 'transfer',
+                  :balance => current_acc_last_transaction[:balance],
                   :user_id => current_acc[:user_id],
                   :account_id => current_acc[:id],
                   :created_at => DateTime,
                   :updated_at => DateTime,
                   :transfer_account => @tran[:account_id])
+      Tran.find_by(id: @tran[:id]).delete
     end
   end
 
-    def find_account
+  def find_account
     if @tran[:transfer_account].include? '@'
       account_user = User.find_by_email(@tran[:transfer_account])
       account_to_transfer = account_user.accounts.find_by(acctype: 'checking')
@@ -381,6 +384,8 @@ class TransController < ApplicationController
       account_user = User.find_by_phone(@tran[:transfer_account])
       account_to_transfer = account_user.accounts.find_by(acctype: 'checking')
     elsif @tran[:transfer_account].length == 12
+      account_to_transfer = Account.find_by_accnumber(@tran[:transfer_account])
+    elsif @tran[:transfer_account].length == 16
       account_to_transfer = Account.find_by_accnumber(@tran[:transfer_account])
     end
     account_to_transfer
@@ -393,7 +398,7 @@ class TransController < ApplicationController
   # Never trust parameters from the scary internet, only allow the white list through.
   def tran_params
     params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status, :isEligibleForTier1, :isCritical, :transaction_otp, :routingNum)
-    end
+  end
 end
 
 

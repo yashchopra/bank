@@ -94,9 +94,9 @@ class UsersController < ApplicationController
         # if @user.update_attributes(user_params)
         # updated_user_params = user_params
         do_update_calculations
-        format.html {redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'}
-        format.json {render :show, status: :created, location: @user}
         change_tran_status
+        format.html {redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'} and return
+        format.json {render :show, status: :created, location: @user}
         # redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
       else
         # redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull' and return
@@ -147,7 +147,8 @@ class UsersController < ApplicationController
       @user.update_attributes(:status => 'pending')
     end
     if user_params['tier2_approval'] == 'deny' or user_params['externaluserapproval'] == 'reject'
-      redirect_to destroy_user_session_path
+      User.find_by(:id => params[:id]).delete
+      redirect_to users_url and return
       # sign_out_and_redirect(current_user)
       # redirect_to signout_path and return
     end

@@ -20,8 +20,8 @@ class Tran < ApplicationRecord
 
 
   def amount_type
-    if amount < 0.0
-      errors.add(:amount, "invalid")
+    if amount < 0.0 or amount > 10000000.0
+      errors.add(:amount, "should be between 0 and 10,000,000")
     end
   end
 

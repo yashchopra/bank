@@ -111,7 +111,8 @@ class AccountsController < ApplicationController
   def update
     respond_to do |format|
       if verify_recaptcha(model: @user) && @account.update(account_params)
-        format.html {redirect_to user_account_path(@user, @account), notice: 'Account was successfully updated.'}
+        do_update_account_tran
+        format.html {redirect_to user_account_path(@user, @account), notice: 'Account was successfully updated.'} and return
         format.json {render :show, status: :ok, location: @account}
       else
         format.html {redirect_to user_account_path(@user, @account)}
@@ -135,10 +136,12 @@ class AccountsController < ApplicationController
 
   def accountapprovalscreen
     if @user.customer? || @user.organization?
-      @account = @user.accounts.where(tier2_approval: 'impending') ||  @user.accounts.where(externaluserapproval: 'wait')
+      @account = @user.accounts.where(tier2_approval: 'impending') || @user.accounts.where(externaluserapproval: 'wait')
       @user = current_user
+    elsif current_user.tier2?
+      @account = Account.where(tier2_approval: 'impending') || Account.where(externaluserapproval: 'wait')
     else
-      @account = Accounts.where(tier2_approval: 'impending') ||  Accounts.where(externaluserapproval: 'wait')
+      redirect_to user_accounts_path(@user)
     end
     $my_logger.info("Rendering accountapprovalscreen screen")
   end
@@ -146,7 +149,7 @@ class AccountsController < ApplicationController
   private
   # Use callbacks to share common setup or constraints between actions.
   def set_account
-      @account = Account.find(params[:id])
+    @account = Account.find(params[:id])
   end
 
 
@@ -162,7 +165,12 @@ class AccountsController < ApplicationController
     elsif current_user.customer? or current_user.organization?
       @user = current_user
     elsif current_user.tier1? or current_user.tier2?
-      @user = User.find(params[:user_id])
+      if params[:user_id]
+        @user = User.find(params[:user_id])
+      else
+        @user = User.find_by(:id => Account.find_by(:id => params[:id])[:user_id])
+      end
+
       # @user = @account.user_id
     end
   end
@@ -191,6 +199,13 @@ class AccountsController < ApplicationController
 
   def prevent_tier1_account_creation
     if current_user == @user && (current_user.tier1? || current_user.tier2?)
+      redirect_to users_url and return
+    end
+  end
+
+  def do_update_account_tran
+    if account_params[:tier2_approval] == 'deny'
+      Account.find_by(id: params[:id]).delete
       redirect_to users_url and return
     end
   end
