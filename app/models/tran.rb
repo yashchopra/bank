@@ -84,6 +84,9 @@ class Tran < ApplicationRecord
       elsif transfer_account.length == 12
         account_to_transfer = transfer_account
         self.transfer_account = account_to_transfer
+      elsif User.find_by_id(Account.find_by(:id => account_id)[:user_id])[:role] == 'organization' and transfer_account.length == 16 and transfer_account.include?("4223")
+        transfer_acc = Account.find_by(:accnumber => transfer_account)
+        errors.add(:transfer_account, "CVV not matched") unless transfer_acc[:accrouting] == routingNum
       end
 
     elsif !account_to_transfer_exist
@@ -95,9 +98,6 @@ class Tran < ApplicationRecord
     account_to_transfer_exist = (Account.exists?(accnumber: transfer_account) or (User.exists?(email: transfer_account)) or (User.exists?(phone: transfer_account)))
     if account_to_transfer_exist and User.find_by_id(Account.find_by(:id => account_id)[:user_id])[:role] == 'customer' and transfer_account.length == 16 and transfer_account.include?("4223")
       errors.add(:transfer_account, 'Customer is not allowed to send/request money from Credit card')
-    else account_to_transfer_exist and User.find_by_id(Account.find_by(:id => account_id)[:user_id])[:role] == 'organization' and transfer_account.length == 16 and transfer_account.include?("4223")
-      transfer_acc = Account.find_by(:accnumber => transfer_account)
-      errors.add(:transfer_account, "CVV not matched") unless transfer_acc[:accrouting] == routingNum
     end
   end
 
