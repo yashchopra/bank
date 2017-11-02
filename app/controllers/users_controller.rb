@@ -1,5 +1,6 @@
 class UsersController < ApplicationController
   before_action :authenticate_user!
+  before_action :my_logger
   before_action :set_int_user
   after_action :verify_authorized, except: [:home, :approval_screen, :approvalscreen_user]
 

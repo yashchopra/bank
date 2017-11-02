@@ -1,5 +1,6 @@
 class TransController < ApplicationController
   before_action :authenticate_user!
+  before_action :my_logger
   before_action :set_tran, only: [:show, :edit, :update, :destroy]
   before_action :set_account
   before_action :trans_type_checker, only:[:new, :create]
@@ -383,6 +384,10 @@ class TransController < ApplicationController
       account_to_transfer = Account.find_by_accnumber(@tran[:transfer_account])
     end
     account_to_transfer
+  end
+
+  def my_logger
+    $my_logger ||= Logger.new("#{Rails.root}/log/my.log")
   end
 
   # Never trust parameters from the scary internet, only allow the white list through.

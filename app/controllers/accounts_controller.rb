@@ -1,5 +1,6 @@
 class AccountsController < ApplicationController
   before_action :authenticate_user!
+  before_action :my_logger
   # before_action :verify_userapproval
   before_action :set_account, only: [:show, :edit, :update, :destroy]
   before_action :set_user
@@ -199,6 +200,9 @@ class AccountsController < ApplicationController
     params.require(:account).permit(:acctype, :accnumber, :accrouting, :user_id, :tier2_approval, :externaluserapproval)
   end
 
+  def my_logger
+    $my_logger ||= Logger.new("#{Rails.root}/log/my.log")
+  end
   # def verify_userapproval
   #    if @usertier2_approval != 'deny' || @user.externaluserapproval != 'reject'
   #      redirect_to approval_screen and return
