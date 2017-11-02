@@ -42,10 +42,12 @@ class TransController < ApplicationController
     end
     if at_checker == "Credit Card"
       @trans_types = ['pay', 'spend']
-    elsif at_checker == "Checking" or at_checker == "Savings"
+    elsif (at_checker == "Checking" or at_checker == "Savings") and (current_user.tier1? or current_user.tier2?)
       @trans_types = ['credit', 'debit', 'transfer', 'request']
+    elsif (at_checker == "Checking" or at_checker == "Savings") and (current_user.customer? or current_user.organization?)
+      @trans_types = ['transfer', 'request']
     else
-      @trans_types = ['Not enough Balance']
+      @trans_types = ['Dummy']
     end
   end
 
@@ -58,7 +60,7 @@ class TransController < ApplicationController
   # POST /trans.json
   def create
     trans_type_checker
-    if @account.authenticate_otp(tran_params[:transaction_otp],drift: 120) && tran_params[:credit] != 'fee'
+    if ((current_user.customer? or current_user.organization?) && @account.authenticate_otp(tran_params[:transaction_otp],drift: 120) && tran_params[:credit] != 'fee') or ((current_user.tier1? or current_user.tier2?) && tran_params[:credit] != 'fee')
       @tran = @account.trans.create(tran_params)
       respond_to do |format|
         @tran = do_transaction_specific_calculations
