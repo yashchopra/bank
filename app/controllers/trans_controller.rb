@@ -16,6 +16,7 @@ class TransController < ApplicationController
     else
       user_not_authorized and return
     end
+    $my_logger.info("Rendering transactions")
   end
 
   # GET /trans/1
@@ -28,6 +29,7 @@ class TransController < ApplicationController
     # @tran = Tran.new
     @tran = @account.trans.new
     trans_type_checker
+    $my_logger.info("Opening new transactions page")
   end
 
   def trans_type_checker
@@ -71,6 +73,7 @@ class TransController < ApplicationController
         format.html {render :new, notice: 'Transaction Unsuccessful!'}
         format.json {render json: 'Transaction Unsuccessful', status: :unprocessable_entity}
       end
+      $my_logger.info("Creating new transactions")
     end
   end
 
@@ -88,6 +91,7 @@ class TransController < ApplicationController
         format.json {render json: @tran.errors, status: :unprocessable_entity}
       end
     end
+    $my_logger.info("Update transactions")
   end
 
   # DELETE /trans/1

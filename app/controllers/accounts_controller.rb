@@ -11,6 +11,7 @@ class AccountsController < ApplicationController
     prevent_tier1_account_creation
     @accounts = @user.accounts.all #where.not(tier2_approval: 'deny').or(@user.accounts.where.not(externaluserapproval: 'reject'))
     # @accounts = Account.all
+    $my_logger.info("Showing all accounts")
   end
 
   # GET /accounts/1
@@ -31,6 +32,7 @@ class AccountsController < ApplicationController
         format.html
       end
     end
+    $my_logger.info("Showing transactions")
   end
 
   def download
@@ -40,6 +42,7 @@ class AccountsController < ApplicationController
     send_data(pdf,
               :filename => 'testpdf.pdf',
               :disposition => 'attachment')
+    $my_logger.info("Downloading pdf")
   end
 
   # GET /accounts/new
@@ -48,6 +51,7 @@ class AccountsController < ApplicationController
       @account = @user.accounts.new
       actp
     end
+    $my_logger.info("Process of creating new account")
   end
 
   def send_otp_to_email
@@ -57,6 +61,7 @@ class AccountsController < ApplicationController
     # account.update_attribute(:otp_secret_key , account.otp_code )
     email = account.user.email
     UserMailer.send_trans_otp(email, code).deliver
+    $my_logger.info("OTP email sent")
   end
 
   def actp
@@ -94,10 +99,10 @@ class AccountsController < ApplicationController
         format.html {render :new}
         format.json {render json: @account.errors, status: :unprocessable_entity}
       end
+
     end
-
     add_initial_ammount(account_params)
-
+    $my_logger.info("Created new account")
   end
 
   # PATCH/PUT /accounts/1
@@ -112,6 +117,7 @@ class AccountsController < ApplicationController
         format.json {render json: @account.errors, status: :unprocessable_entity}
       end
     end
+    $my_logger.info("Account update")
   end
 
   # DELETE /accounts/1
@@ -122,6 +128,7 @@ class AccountsController < ApplicationController
       format.html {redirect_to user_accounts_path(@user), notice: 'Account was successfully destroyed.'}
       format.json {head :no_content}
     end
+    $my_logger.info("Account deleted")
   end
 
 
@@ -132,7 +139,7 @@ class AccountsController < ApplicationController
     else
       @account = Accounts.where(tier2_approval: 'impending') ||  Accounts.where(externaluserapproval: 'wait')
     end
-
+    $my_logger.info("Rendering accountapprovalscreen screen")
   end
 
   private
