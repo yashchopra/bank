@@ -84,7 +84,7 @@ class TransController < ApplicationController
         format.json {render :show, status: :ok, location: @tran}
         change_status(tran_params)
       else
-        format.html {render :edit}
+        format.html {redirect_to account_trans_path(Account), notice: 'Tran update cancelled.'}
         format.json {render json: @tran.errors, status: :unprocessable_entity}
       end
     end
@@ -383,7 +383,7 @@ class TransController < ApplicationController
 
   # Never trust parameters from the scary internet, only allow the white list through.
   def tran_params
-    params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status, :isEligibleForTier1, :isCritical, :transaction_otp)
+    params.require(:tran).permit(:amount, :credit, :balance, :user_id, :account_id, :transfer_account, :status, :isEligibleForTier1, :isCritical, :transaction_otp, :routingNum)
     end
 end
 
