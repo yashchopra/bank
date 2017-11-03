@@ -27,22 +27,22 @@
     </div>
 
     <div class="field hidden routingNum">
-      <%= form.label :'Routing Number' %>
+      <%= form.label :'Routing Number/ CVV' %>
       <%= form.text_field :routingNum, id: :routingNum %>
     </div>
-
-    <div class="btn waves-effect waves-light" id="send-otp" type="button" name="action">
-      Send OTP
-    </div>
-    <br/>
-    <br/>
-    <br/>
-    <div class="field">
-      <%= form.label 'Enter OTP' %>
-      <%= form.text_field :transaction_otp, id: :transaction_otp, :required => true %>
-    </div>
-
-    <div class="btn waves-effect waves-light disabled" type="submit" name="action" id="create_transaction">
+    <% if @current_user.role == "customer" || @current_user.role == "organization"  %>
+      <div class="btn waves-effect waves-light" id="send-otp" type="button" name="action">
+        Send OTP
+      </div>
+      <br/>
+      <br/>
+      <br/>
+      <div class="field">
+        <%= form.label 'Enter OTP' %>
+        <%= form.text_field :transaction_otp, id: :transaction_otp%>
+      </div>
+    <% end %>
+    <div class="btn waves-effect waves-light" type="submit" name="action" id="create_transaction">
       <%= form.submit %>
     </div>
 <% end %>
@@ -60,12 +60,12 @@
         }
       });
   })
-  $('#transaction_otp').on('click',function(){
-      $('#create_transaction').removeClass("disabled");
-  })
+
   $('#tran_transfer_account').keyup(function () {
       if(this.value.length === 16 && /^\d+$/.test(this.value)){
           $('.routingNum').removeClass("hidden");
+      }else{
+          $('.routingNum').addClass("hidden");
       }
   })
 </script>

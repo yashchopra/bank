@@ -1,4 +1,5 @@
 class UsersController < ApplicationController
+
   before_action :authenticate_user!
   before_action :my_logger
   before_action :set_int_user
@@ -19,6 +20,7 @@ class UsersController < ApplicationController
   def home
     my_logger
     add_credit_card_interest
+    $my_logger.info(@current_user.role + "Logged in")
     if current_user.role == 'admin' or current_user.role == 'tier2' or current_user.role == 'tier1'
       redirect_to users_url and return
     elsif current_user.role == 'customer' or current_user.role == 'organization'
@@ -28,9 +30,11 @@ class UsersController < ApplicationController
         redirect_to user_accounts_path(@current_user) and return
       end
     end
+
   end
 
   def approvalscreen
+    $my_logger.info("Showing Approval Screen")
     authorize current_user
     if current_user.admin?
       @user = User.where(role: "admin",tier2_approval: 'impending').or(User.where(role:'tier1',tier2_approval: 'impending')).or(User.where(role:"tier2",tier2_approval: 'impending' ))
@@ -41,10 +45,12 @@ class UsersController < ApplicationController
   end
 
   def approvalscreen_user
+    $my_logger.info("Showing User Approval Screen")
     @user = current_user
   end
 
   def index
+    $my_logger.info("Showing User List")
     @users = correct_user_list
     authorize User
   end
@@ -53,11 +59,13 @@ class UsersController < ApplicationController
   def edit
     @user = User.find(params[:id])
     authorize @user
+    $my_logger.info("Editing "+ @user.email)
   end
 
   def destroy
     user = User.find(params[:id])
     authorize user
+    $my_logger.info("Deleting " + @user.email)
     user.destroy
     redirect_to users_url, :notice => "User deleted"
   end
@@ -70,6 +78,7 @@ class UsersController < ApplicationController
   def create
     @user = User.new(user_params)
     authorize current_user
+    $my_logger.info("Creating new user" + @user.email)
     respond_to do |format|
       @user = set_default_status
       # @user.tier2_approval = "Y"
@@ -78,9 +87,11 @@ class UsersController < ApplicationController
       #if @user.save
         format.html {redirect_to users_url, notice: 'Account was successfully created.'}
         format.json {render :show, status: :created, location: @user}
+        $my_logger.info("Create User successful")
       else
         format.html {render :new}
         format.json {render json: @user.errors, status: :unprocessable_entity}
+        $my_logger.info("User creation unsuccessful")
       end
       # set_status
     end
@@ -93,12 +104,14 @@ class UsersController < ApplicationController
       if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
         # if @user.update_attributes(user_params)
         # updated_user_params = user_params
+        $my_logger.info("Update User successful")
         do_update_calculations
         change_tran_status
         format.html {redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.'} and return
         format.json {render :show, status: :created, location: @user}
         # redirect_to user_accounts_path(@current_user), notice: 'User was successfully updated.' and return
       else
+        $my_logger.info("Update User not successful")
         # redirect_to user_accounts_path(@current_user), notice: 'User update unsuccessfull' and return
         format.html {redirect_to user_accounts_path(@current_user), notice: 'User update cancel'}
         format.json {render json: @user.errors, status: :unprocessable_entity}
@@ -158,6 +171,7 @@ class UsersController < ApplicationController
     if user_params['tier2_approval'] == 'allow' or user_params['externaluserapproval'] == 'accept'
       @user.update_attributes(:externaluserapproval => '')
       @user.update_attributes(:tier2_approval => '')
+      $my_logger.info("Transaction status Changed")
     end
   end
 
@@ -186,6 +200,7 @@ class UsersController < ApplicationController
     if @user[:updated_email] or @user[:updated_phone]
       is_critical = true
     end
+    $my_logger.info("Critical information changed")
     is_critical
   end
 
@@ -221,6 +236,8 @@ class UsersController < ApplicationController
                             :created_at => DateTime,
                             :updated_at => DateTime)
                 account.update_attributes(:statement_balance => account[:statement_balance].to_int + fee_amount)
+
+                $my_logger.info("Interest Charged")
               end
             end
           end
@@ -236,12 +253,14 @@ class UsersController < ApplicationController
                           :created_at => DateTime,
                           :updated_at => DateTime)
               account.update_attributes(:statement_balance => account[:statement_balance].to_int + fee_amount)
+              $my_logger.info("Interest Charged")
             end
           end
         end
       end
     elsif /[0-9][0-9][0-9][0-9]-[0-9][0-9]-01/ === Date.today.to_s
       cc_accounts = Account.where(acctype: 'Credit Card')
+      $my_logger.info("Interest Charged")
       cc_accounts.each do |account|
         account.update_attributes(:statement_balance => account.trans.last[:balance])
       end
