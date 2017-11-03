@@ -101,9 +101,7 @@ class UsersController < ApplicationController
     @user = User.find(params[:id])
     authorize @user
     respond_to do |format|
-      if verify_recaptcha(model: @user) && @user.update_attributes(user_params)
-        # if @user.update_attributes(user_params)
-        # updated_user_params = user_params
+      if @user.update_attributes(user_params)
         $my_logger.info("Update User successful")
         do_update_calculations
         change_tran_status

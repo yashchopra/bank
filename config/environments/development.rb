@@ -36,8 +36,6 @@ Rails.application.configure do
   config.action_mailer.default :charset => "utf-8"
 
   config.action_mailer.perform_deliveries = true
-  config.force_ssl = true
-
   # Raise an error on page load if there are pending migrations.
   config.active_record.migration_error = :page_load
 
@@ -47,6 +45,7 @@ Rails.application.configure do
   # This option may cause significant delays in view rendering with a large
   # number of complex assets.
   config.assets.debug = true
+  config.action_view.automatically_disable_submit_tag = false
 
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {

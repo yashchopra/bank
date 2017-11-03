@@ -32,7 +32,6 @@
             <%= form_for(user) do |f| %>
                 <span>User Name: <%= user.first_name %> <%= user.last_name %></span>
                 <span> <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %> </span>
-                <div class="recaptcha"></div>
                 <div class="btn waves-effect waves-light" type="submit" name="action">
                   <%= f.submit 'Update info' %>
                 </div>
@@ -49,7 +48,6 @@
             <%= form_for(account) do |f| %>
                 <span>Account number: <%= account[:accnumber] %> </span>
                 <%= f.select :tier2_approval, ['impending', 'allow', 'deny'] %>
-                <div class="recaptcha"></div>
                 <div class="btn waves-effect waves-light" type="submit" name="action">
                   <%= f.submit 'Update info' %>
                 </div>
