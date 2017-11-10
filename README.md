@@ -1,24 +1,9 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+* Ruby version - 2.2.4
 
-Things you may want to cover:
+* Rails - 5.0
 
-* Ruby version
+* Database - MySql
 
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+This app is created as part of CSE 545; Software Security class.
